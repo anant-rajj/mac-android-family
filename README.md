@@ -1,9 +1,10 @@
 <div align="center">
 
-# Mac-Android Family
+# Mac-Android Family (mac-and)
 ### Universal Phone & Tablet Graphics Digitizer for macOS
 
 [![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Android%20%7C%20iPadOS-black?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/anant-rajj/mac-android-family)
+[![CLI](https://img.shields.io/badge/CLI-mac--and-blueviolet?style=for-the-badge)](https://github.com/anant-rajj/mac-android-family)
 [![Device Support](https://img.shields.io/badge/Devices-Any%20Phone%20or%20Tablet-purple?style=for-the-badge)](https://github.com/anant-rajj/mac-android-family)
 [![Stylus Support](https://img.shields.io/badge/Stylus-S%20Pen%20%7C%20Apple%20Pencil%20%7C%20USI%20%7C%20Touch-00e5ff?style=for-the-badge)](https://github.com/anant-rajj/mac-android-family)
 [![Sampling](https://img.shields.io/badge/Sampling-240Hz%20Coalesced-00e676?style=for-the-badge)](https://github.com/anant-rajj/mac-android-family)
@@ -28,9 +29,9 @@ Engineered with sub-millisecond event synthesis, native Apple Quartz tablet taps
 - [System Architecture](#-system-architecture)
 - [Core Capabilities](#-core-capabilities)
 - [Data Pipeline](#-data-pipeline)
-- [How to Download](#-how-to-download)
+- [How to Download & Install](#-how-to-download--install)
 - [How to Operate](#-how-to-operate)
-- [Command-Line Interface](#-command-line-interface)
+- [Command-Line Interface (mac-and)](#-command-line-interface-mac-and)
 - [How to Uninstall](#-how-to-uninstall)
 - [Technical Specifications](#-technical-specifications)
 - [Repository Structure](#-repository-structure)
@@ -86,7 +87,7 @@ Mac-Android Family bridges mobile touchscreens and digitizers directly into macO
 - **Sub-Millisecond 1-Euro Filter**: An adaptive cutoff filter ($f_c = f_{c,\min} + \beta \cdot |\dot{x}|$) that stabilizes stationary precision work while remaining instant during fast sketching.
 - **Turbo 12-Byte Wire Format**: Packed binary format over WebSockets with `TCP_NODELAY`, bypassing heavy JSON parsers.
 - **Isolated Quartz Event Tap**: Uses a private `CGEventSource` state to prevent modifier key latching bugs across macOS.
-- **Zero-Install Web Portal**: Instant pairing via any mobile browser (Chrome, Safari, Samsung Internet, Edge, Firefox).
+- **Global `mac-and` Terminal Command**: Execute commands from any terminal session without prefixing directory paths.
 
 ---
 
@@ -111,26 +112,28 @@ The pipeline processes input packets from physical glass contact to macOS brush 
 
 ---
 
-## 📥 How to Download
+## 📥 How to Download & Install
 
-### Option 1: Git Clone (Recommended)
+### Step 1: Clone the Repository
 
-Open Terminal on your Mac and clone the repository:
+Open Terminal on your Mac and clone:
 
 ```bash
 git clone https://github.com/anant-rajj/mac-android-family.git
 cd mac-android-family
 ```
 
-### Option 2: Direct Archive Download
+### Step 2: One-Step Global CLI Installation
 
-Download and unpack the latest repository package:
+Run the automated installer to link the `mac-and` command globally into your environment:
 
 ```bash
-curl -L -o mac-android-family.zip https://github.com/anant-rajj/mac-android-family/archive/refs/heads/main.zip
-unzip mac-android-family.zip
-cd mac-android-family-main
+./install.sh
 ```
+
+This adds `mac-and` directly to `~/.local/bin/mac-and`, allowing you to run `mac-and <command>` from **any folder** in your terminal!
+
+*(Alternatively, you can run `./mac-and <command>` directly inside the project directory without installation)*.
 
 ### Prerequisites Check
 
@@ -157,13 +160,13 @@ Follow these steps to connect your device and start drawing:
 
 ### Step 1: Launch the System
 
-Inside the project directory, run the primary launcher:
+From any terminal window, run:
 
 ```bash
-./start.sh start
+mac-and start
 ```
 
-*(Or use the convenience alias `./family start`)*.
+*(If running without installation: `./mac-and start`)*.
 
 The system will:
 1. Verify and compile the native Swift daemon in release mode if needed.
@@ -199,16 +202,16 @@ Touch your stylus or finger to your mobile screen. Your Mac cursor tracks your h
 
 ---
 
-## 💻 Command-Line Interface
+## 💻 Command-Line Interface (mac-and)
 
-The repository provides an interactive CLI tool (`./start.sh` or `./family`) to control all operations:
+The project includes the unified `mac-and` command line tool:
 
 ```
-  __  __                  _              _           _     _ 
- |  \/  |                / \   _ __   __| |_ __ ___ (_) __| |
- | |\/| | _____ ____    / _ \ | '_ \ / _` | '__/ _ \| |/ _` |
- | |  | |/ _ \ \/ /\ \ / ___ \| | | | (_| | | | (_) | | (_| |
- |_|  |_|\___/\_/  \_//_/   \_\_| |_|\__,_|_|  \___/|_|\__,_|
+ __  __    _    ____       _    _   _ ____  
+|  \/  |  / \  / ___|     / \  | \ | |  _ \ 
+| |\/| | / _ \| |   _____/ _ \ |  \| | | | |
+| |  | |/ ___ \ |__|_____/ ___ \| |\  | |_| |
+|_|  |_/_/   \_\____|   /_/   \_\_| \_|____/ 
    Universal Phone & Tablet Graphics Digitizer • macOS Engine
 ```
 
@@ -216,42 +219,46 @@ The repository provides an interactive CLI tool (`./start.sh` or `./family`) to 
 
 | Command | Syntax | Description |
 | :--- | :--- | :--- |
-| **Help Menu** | `./start.sh help` | Prints the complete interactive guide and available commands |
-| **Start Services** | `./start.sh start` | Compiles binaries if needed, starts daemon and bridge, prints QR code |
-| **Stop Services** | `./start.sh stop` | Gracefully shuts down daemon and bridge, releases ports 8080, 9876, 9877 |
-| **Status Audit** | `./start.sh status` | Inspects process health, PIDs, and active network port listeners |
-| **Show QR** | `./start.sh qr` | Renders terminal ASCII QR code and pairing link |
-| **Compile Daemon** | `./start.sh build` | Compiles native Swift daemon using `swift build -c release` |
-| **Loopback Test** | `./start.sh test` | Injects synthetic 12-byte stylus frame to verify Quartz tap functionality |
-| **Uninstall** | `./start.sh uninstall` | Stops services, cleans binary build trees, and removes caches |
+| **Help Menu** | `mac-and help` | Prints the complete interactive guide and available commands |
+| **Start Services** | `mac-and start` | Compiles binaries if needed, starts daemon and bridge, prints QR code |
+| **Stop Services** | `mac-and stop` | Gracefully shuts down daemon and bridge, releases ports 8080, 9876, 9877 |
+| **Status Audit** | `mac-and status` | Inspects process health, PIDs, and active network port listeners |
+| **Show QR** | `mac-and qr` | Renders terminal ASCII QR code and pairing link |
+| **Compile Daemon** | `mac-and build` | Compiles native Swift daemon using `swift build -c release` |
+| **Loopback Test** | `mac-and test` | Injects synthetic 12-byte stylus frame to verify Quartz tap functionality |
+| **Install Global CLI** | `mac-and install` | Links `mac-and` to `~/.local/bin/mac-and` for access from any directory |
+| **Uninstall** | `mac-and uninstall` | Stops services, cleans binary build trees, and removes global CLI link |
 
 ---
 
 ## 🗑️ How to Uninstall
 
-To cleanly remove all runtime components and build artifacts:
+Uninstallation is simple and immediate:
 
-### Method 1: Automated Script Cleanup
+### Method 1: Single-Command Uninstallation
 
-Run the built-in uninstall command:
+Run the uninstaller directly from anywhere in your terminal:
 
 ```bash
-./start.sh uninstall
+mac-and uninstall
 ```
+
+*(Or execute `./uninstall.sh` inside the repository)*.
 
 This command will:
 1. Terminate all active daemon processes and bridge listeners.
 2. Release network ports (`8080`, `9876`, `9877`).
-3. Remove compiled Swift binaries (`macos_daemon/.build`).
-4. Delete runtime PID files and generated pairing caches.
+3. Remove the global CLI shortcut (`~/.local/bin/mac-and`).
+4. Purge compiled Swift binaries (`macos_daemon/.build`).
+5. Delete runtime PID files and temporary pairing caches.
 
-### Method 2: Complete Project Removal
+### Method 2: Complete Project Directory Removal
 
 To delete the repository folder completely from your machine:
 
 ```bash
-# 1. Ensure services are stopped
-./start.sh stop
+# 1. Cleanly stop services and unregister CLI
+mac-and uninstall
 
 # 2. Delete the directory
 cd ..
@@ -312,8 +319,8 @@ The repository maintains a clean, minimalist layout:
 mac-android-family/
 ├── assets/                                 # Visual graphics and animated diagrams
 │   ├── spen_digitizer_animation.svg        # Universal tablet to Mac continuity animation
-│   ├── data_pipeline_animation.svg         # 5-stage architectural pipeline animation
-│   └── terminal_cli_animation.svg          # Terminal CLI interactive demonstration
+│   ├── data_pipeline_animation.svg         # 5-stage sequential pipeline animation
+│   └── terminal_cli_animation.svg          # mac-and terminal CLI interactive demonstration
 ├── android_client/                         # Native Android Kotlin implementation
 │   ├── AndroidManifest.xml                 # Sensor-adaptive orientation manifest
 │   ├── build.gradle.kts                    # Gradle build definition
@@ -333,8 +340,11 @@ mac-android-family/
 │       └── QuartzTabletBridge.swift        # Apple Quartz event tap synthesizer
 ├── web_client/                             # Universal zero-install browser digitizer
 │   └── index.html                          # 240Hz pointer canvas and binary streamer
-├── start.sh                                # Unified CLI manager (start/stop/status)
-├── family                                  # Symlink to start.sh for easy terminal access
+├── mac-and                                 # Primary global CLI executable
+├── install.sh                              # Automated installer for ~/.local/bin/mac-and
+├── uninstall.sh                            # One-line uninstaller script
+├── start.sh                                # Symlink to mac-and for compatibility
+├── family                                  # Symlink to mac-and for compatibility
 ├── LICENSE                                 # MIT License
 └── README.md                               # System documentation and manuals
 ```
