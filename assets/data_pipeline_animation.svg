@@ -1,359 +1,411 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1070 320" width="100%" height="100%">
   <defs>
+    <!-- Background Gradient -->
     <linearGradient id="pipe-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0a0c10" />
-      <stop offset="100%" stop-color="#10131a" />
+      <stop offset="0%" stop-color="#080a0f" />
+      <stop offset="50%" stop-color="#0d111a" />
+      <stop offset="100%" stop-color="#111622" />
     </linearGradient>
+
+    <!-- Super Warm Incandescent Glowing Filter for Connecting Middle Lines -->
+    <filter id="glow-warm-line" x="-60%" y="-300%" width="220%" height="700%">
+      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#ffffff" flood-opacity="0.9" />
+      <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#ffb703" flood-opacity="1" />
+      <feDropShadow dx="0" dy="0" stdDeviation="16" flood-color="#ff7b00" flood-opacity="0.95" />
+      <feDropShadow dx="0" dy="0" stdDeviation="28" flood-color="#ff3c00" flood-opacity="0.8" />
+    </filter>
+
+    <filter id="glow-warm-spark" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur1" />
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur2" />
+        <feMergeNode in="blur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
 
     <!-- Specific Glow Filters for Each Box -->
     <filter id="glow-cyan" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#00e5ff" flood-opacity="0.9" />
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#00e5ff" flood-opacity="0.95" />
+      <feDropShadow dx="0" dy="0" stdDeviation="20" flood-color="#0088ff" flood-opacity="0.6" />
     </filter>
     <filter id="glow-purple" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#a855f7" flood-opacity="0.9" />
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#c084fc" flood-opacity="0.95" />
+      <feDropShadow dx="0" dy="0" stdDeviation="20" flood-color="#9333ea" flood-opacity="0.6" />
     </filter>
     <filter id="glow-green" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#00e676" flood-opacity="0.9" />
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#00e676" flood-opacity="0.95" />
+      <feDropShadow dx="0" dy="0" stdDeviation="20" flood-color="#00b0ff" flood-opacity="0.6" />
     </filter>
     <filter id="glow-blue" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#38bdf8" flood-opacity="0.9" />
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#38bdf8" flood-opacity="0.95" />
+      <feDropShadow dx="0" dy="0" stdDeviation="20" flood-color="#2563eb" flood-opacity="0.6" />
     </filter>
     <filter id="glow-coral" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#ff5f56" flood-opacity="0.9" />
-    </filter>
-
-    <filter id="spark-glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="2.5" result="blur" />
-      <feMerge>
-        <feMergeNode in="blur" />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#ff5f56" flood-opacity="0.95" />
+      <feDropShadow dx="0" dy="0" stdDeviation="20" flood-color="#e11d48" flood-opacity="0.6" />
     </filter>
   </defs>
 
   <style><![CDATA[
-    /* 6-SECOND CHOREOGRAPHED ENERGY CYCLE */
+    /* 20-SECOND SUPER SLOW CHOREOGRAPHED ENERGY CYCLE */
+    /* Connecting middle lines feature deep incandescent warming radiance (#ffb703 / #ff7b00 / #ff3c00) */
 
-    /* STAGE 1: ENTRY AND BOX 1 (Cyan #00e5ff) */
+    /* ENTRY SEGMENT (0% to 3%: 0.0s to 0.6s) */
     @keyframes kf-entry-spark {
-      0% { transform: translateX(15px); opacity: 0; }
-      0.5% { opacity: 1; transform: translateX(15px); }
-      3% { opacity: 1; transform: translateX(40px); }
-      3.5%, 100% { opacity: 0; transform: translateX(40px); }
+      0% { transform: translateX(5px); opacity: 0; }
+      0.5% { opacity: 1; transform: translateX(5px); }
+      2.5% { opacity: 1; transform: translateX(25px); }
+      3%, 100% { opacity: 0; transform: translateX(25px); }
     }
+    @keyframes kf-entry-line {
+      0% { opacity: 0; }
+      0.5%, 2.5% { opacity: 1; }
+      3%, 100% { opacity: 0; }
+    }
+
+    /* BOX 1: Phone / Tablet (3% to 15%: 0.6s to 3.0s) */
     @keyframes kf-box-1-glow {
       0%, 2.5% { opacity: 0; }
       3.5% { opacity: 1; }
-      15% { opacity: 1; }
-      16%, 100% { opacity: 0; }
+      14% { opacity: 1; }
+      15%, 100% { opacity: 0; }
     }
     @keyframes kf-ring-1-trace {
-      0%, 2.5% { stroke-dashoffset: 540; opacity: 0; }
+      0%, 2.5% { stroke-dashoffset: 628; opacity: 0; }
       3.5% { opacity: 1; }
-      15% { stroke-dashoffset: 0; opacity: 1; }
-      16%, 100% { stroke-dashoffset: 0; opacity: 0; }
+      14% { stroke-dashoffset: 0; opacity: 1; }
+      15%, 100% { stroke-dashoffset: 0; opacity: 0; }
     }
 
-    /* SEGMENT 1: BOX 1 TO BOX 2 (16% - 22%) */
+    /* CONNECTING LINE 1: BOX 1 TO BOX 2 (15% to 23%: 3.0s to 4.6s) - SUPER SLOW WARMING */
     @keyframes kf-seg-1-spark {
-      0%, 15.5% { transform: translateX(180px); opacity: 0; }
-      16% { opacity: 1; transform: translateX(180px); }
-      21.5% { opacity: 1; transform: translateX(225px); }
-      22%, 100% { opacity: 0; transform: translateX(225px); }
+      0%, 14.5% { transform: translateX(189px); opacity: 0; }
+      15% { opacity: 1; transform: translateX(189px); }
+      22.5% { opacity: 1; transform: translateX(239px); }
+      23%, 100% { opacity: 0; transform: translateX(239px); }
     }
     @keyframes kf-seg-1-line {
-      0%, 15.5% { opacity: 0; }
-      16%, 21.5% { opacity: 1; }
-      22%, 100% { opacity: 0; }
+      0%, 14.5% { opacity: 0; }
+      15%, 22.5% { opacity: 1; }
+      23%, 100% { opacity: 0; }
     }
 
-    /* STAGE 2: BOX 2 (Purple #a855f7) (22% - 35%) */
+    /* BOX 2: 1-Euro Filter (23% to 35%: 4.6s to 7.0s) */
     @keyframes kf-box-2-glow {
-      0%, 21.5% { opacity: 0; }
-      22.5% { opacity: 1; }
+      0%, 22.5% { opacity: 0; }
+      23.5% { opacity: 1; }
       34% { opacity: 1; }
       35%, 100% { opacity: 0; }
     }
     @keyframes kf-ring-2-trace {
-      0%, 21.5% { stroke-dashoffset: 540; opacity: 0; }
-      22.5% { opacity: 1; }
+      0%, 22.5% { stroke-dashoffset: 628; opacity: 0; }
+      23.5% { opacity: 1; }
       34% { stroke-dashoffset: 0; opacity: 1; }
       35%, 100% { stroke-dashoffset: 0; opacity: 0; }
     }
 
-    /* SEGMENT 2: BOX 2 TO BOX 3 (35% - 41%) */
+    /* CONNECTING LINE 2: BOX 2 TO BOX 3 (35% to 43%: 7.0s to 8.6s) - SUPER SLOW WARMING */
     @keyframes kf-seg-2-spark {
-      0%, 34.5% { transform: translateX(365px); opacity: 0; }
-      35% { opacity: 1; transform: translateX(365px); }
-      40.5% { opacity: 1; transform: translateX(410px); }
-      41%, 100% { opacity: 0; transform: translateX(410px); }
+      0%, 34.5% { transform: translateX(403px); opacity: 0; }
+      35% { opacity: 1; transform: translateX(403px); }
+      42.5% { opacity: 1; transform: translateX(453px); }
+      43%, 100% { opacity: 0; transform: translateX(453px); }
     }
     @keyframes kf-seg-2-line {
       0%, 34.5% { opacity: 0; }
-      35%, 40.5% { opacity: 1; }
-      41%, 100% { opacity: 0; }
+      35%, 42.5% { opacity: 1; }
+      43%, 100% { opacity: 0; }
     }
 
-    /* STAGE 3: BOX 3 (Green #00e676) (41% - 54%) */
+    /* BOX 3: 12-Byte Binary (43% to 55%: 8.6s to 11.0s) */
     @keyframes kf-box-3-glow {
-      0%, 40.5% { opacity: 0; }
-      41.5% { opacity: 1; }
-      53% { opacity: 1; }
-      54%, 100% { opacity: 0; }
+      0%, 42.5% { opacity: 0; }
+      43.5% { opacity: 1; }
+      54% { opacity: 1; }
+      55%, 100% { opacity: 0; }
     }
     @keyframes kf-ring-3-trace {
-      0%, 40.5% { stroke-dashoffset: 540; opacity: 0; }
-      41.5% { opacity: 1; }
-      53% { stroke-dashoffset: 0; opacity: 1; }
-      54%, 100% { stroke-dashoffset: 0; opacity: 0; }
+      0%, 42.5% { stroke-dashoffset: 628; opacity: 0; }
+      43.5% { opacity: 1; }
+      54% { stroke-dashoffset: 0; opacity: 1; }
+      55%, 100% { stroke-dashoffset: 0; opacity: 0; }
     }
 
-    /* SEGMENT 3: BOX 3 TO BOX 4 (54% - 60%) */
+    /* CONNECTING LINE 3: BOX 3 TO BOX 4 (55% to 63%: 11.0s to 12.6s) - SUPER SLOW WARMING */
     @keyframes kf-seg-3-spark {
-      0%, 53.5% { transform: translateX(550px); opacity: 0; }
-      54% { opacity: 1; transform: translateX(550px); }
-      59.5% { opacity: 1; transform: translateX(595px); }
-      60%, 100% { opacity: 0; transform: translateX(595px); }
+      0%, 54.5% { transform: translateX(617px); opacity: 0; }
+      55% { opacity: 1; transform: translateX(617px); }
+      62.5% { opacity: 1; transform: translateX(667px); }
+      63%, 100% { opacity: 0; transform: translateX(667px); }
     }
     @keyframes kf-seg-3-line {
-      0%, 53.5% { opacity: 0; }
-      54%, 59.5% { opacity: 1; }
-      60%, 100% { opacity: 0; }
+      0%, 54.5% { opacity: 0; }
+      55%, 62.5% { opacity: 1; }
+      63%, 100% { opacity: 0; }
     }
 
-    /* STAGE 4: BOX 4 (Blue #38bdf8) (60% - 73%) */
+    /* BOX 4: Low-Latency Link (63% to 75%: 12.6s to 15.0s) */
     @keyframes kf-box-4-glow {
-      0%, 59.5% { opacity: 0; }
-      60.5% { opacity: 1; }
-      72% { opacity: 1; }
-      73%, 100% { opacity: 0; }
+      0%, 62.5% { opacity: 0; }
+      63.5% { opacity: 1; }
+      74% { opacity: 1; }
+      75%, 100% { opacity: 0; }
     }
     @keyframes kf-ring-4-trace {
-      0%, 59.5% { stroke-dashoffset: 540; opacity: 0; }
-      60.5% { opacity: 1; }
-      72% { stroke-dashoffset: 0; opacity: 1; }
-      73%, 100% { stroke-dashoffset: 0; opacity: 0; }
+      0%, 62.5% { stroke-dashoffset: 628; opacity: 0; }
+      63.5% { opacity: 1; }
+      74% { stroke-dashoffset: 0; opacity: 1; }
+      75%, 100% { stroke-dashoffset: 0; opacity: 0; }
     }
 
-    /* SEGMENT 4: BOX 4 TO BOX 5 (73% - 79%) */
+    /* CONNECTING LINE 4: BOX 4 TO BOX 5 (75% to 83%: 15.0s to 16.6s) - SUPER SLOW WARMING */
     @keyframes kf-seg-4-spark {
-      0%, 72.5% { transform: translateX(735px); opacity: 0; }
-      73% { opacity: 1; transform: translateX(735px); }
-      78.5% { opacity: 1; transform: translateX(780px); }
-      79%, 100% { opacity: 0; transform: translateX(780px); }
+      0%, 74.5% { transform: translateX(831px); opacity: 0; }
+      75% { opacity: 1; transform: translateX(831px); }
+      82.5% { opacity: 1; transform: translateX(881px); }
+      83%, 100% { opacity: 0; transform: translateX(881px); }
     }
     @keyframes kf-seg-4-line {
-      0%, 72.5% { opacity: 0; }
-      73%, 78.5% { opacity: 1; }
-      79%, 100% { opacity: 0; }
+      0%, 74.5% { opacity: 0; }
+      75%, 82.5% { opacity: 1; }
+      83%, 100% { opacity: 0; }
     }
 
-    /* STAGE 5: BOX 5 (Coral #ff5f56) (79% - 92%) */
+    /* BOX 5: Quartz Injection (83% to 95%: 16.6s to 19.0s) */
     @keyframes kf-box-5-glow {
-      0%, 78.5% { opacity: 0; }
-      79.5% { opacity: 1; }
-      91% { opacity: 1; }
-      92%, 100% { opacity: 0; }
+      0%, 82.5% { opacity: 0; }
+      83.5% { opacity: 1; }
+      94% { opacity: 1; }
+      95%, 100% { opacity: 0; }
     }
     @keyframes kf-ring-5-trace {
-      0%, 78.5% { stroke-dashoffset: 540; opacity: 0; }
-      79.5% { opacity: 1; }
-      91% { stroke-dashoffset: 0; opacity: 1; }
-      92%, 100% { stroke-dashoffset: 0; opacity: 0; }
+      0%, 82.5% { stroke-dashoffset: 628; opacity: 0; }
+      83.5% { opacity: 1; }
+      94% { stroke-dashoffset: 0; opacity: 1; }
+      95%, 100% { stroke-dashoffset: 0; opacity: 0; }
     }
 
-    /* EXIT SEGMENT: BOX 5 TO END (92% - 96%) */
+    /* EXIT SEGMENT (95% to 98%: 19.0s to 19.6s) - SUPER SLOW WARMING */
     @keyframes kf-exit-spark {
-      0%, 91.5% { transform: translateX(920px); opacity: 0; }
-      92% { opacity: 1; transform: translateX(920px); }
-      96% { opacity: 1; transform: translateX(945px); }
-      96.5%, 100% { opacity: 0; transform: translateX(945px); }
+      0%, 94.5% { transform: translateX(1045px); opacity: 0; }
+      95% { opacity: 1; transform: translateX(1045px); }
+      98% { opacity: 1; transform: translateX(1065px); }
+      98.5%, 100% { opacity: 0; transform: translateX(1065px); }
     }
     @keyframes kf-exit-line {
-      0%, 91.5% { opacity: 0; }
-      92%, 96% { opacity: 1; }
-      96.5%, 100% { opacity: 0; }
+      0%, 94.5% { opacity: 0; }
+      95%, 98% { opacity: 1; }
+      98.5%, 100% { opacity: 0; }
     }
 
-    /* Application Classes */
-    .anim-entry-spark { animation: kf-entry-spark 6s linear infinite; }
-    .anim-box-1-glow { animation: kf-box-1-glow 6s ease-in-out infinite; }
-    .anim-ring-1 { stroke-dasharray: 140 400; animation: kf-ring-1-trace 6s ease-in-out infinite; }
+    /* Dynamic Application Classes (20s cycle) */
+    .anim-entry-spark { animation: kf-entry-spark 20s linear infinite; }
+    .anim-entry-line  { animation: kf-entry-line 20s linear infinite; }
 
-    .anim-seg-1-spark { animation: kf-seg-1-spark 6s linear infinite; }
-    .anim-seg-1-line { animation: kf-seg-1-line 6s linear infinite; }
-    .anim-box-2-glow { animation: kf-box-2-glow 6s ease-in-out infinite; }
-    .anim-ring-2 { stroke-dasharray: 140 400; animation: kf-ring-2-trace 6s ease-in-out infinite; }
+    .anim-box-1-glow { animation: kf-box-1-glow 20s ease-in-out infinite; }
+    .anim-ring-1     { stroke-dasharray: 160 468; animation: kf-ring-1-trace 20s ease-in-out infinite; }
 
-    .anim-seg-2-spark { animation: kf-seg-2-spark 6s linear infinite; }
-    .anim-seg-2-line { animation: kf-seg-2-line 6s linear infinite; }
-    .anim-box-3-glow { animation: kf-box-3-glow 6s ease-in-out infinite; }
-    .anim-ring-3 { stroke-dasharray: 140 400; animation: kf-ring-3-trace 6s ease-in-out infinite; }
+    .anim-seg-1-spark { animation: kf-seg-1-spark 20s linear infinite; }
+    .anim-seg-1-line  { animation: kf-seg-1-line 20s linear infinite; }
 
-    .anim-seg-3-spark { animation: kf-seg-3-spark 6s linear infinite; }
-    .anim-seg-3-line { animation: kf-seg-3-line 6s linear infinite; }
-    .anim-box-4-glow { animation: kf-box-4-glow 6s ease-in-out infinite; }
-    .anim-ring-4 { stroke-dasharray: 140 400; animation: kf-ring-4-trace 6s ease-in-out infinite; }
+    .anim-box-2-glow { animation: kf-box-2-glow 20s ease-in-out infinite; }
+    .anim-ring-2     { stroke-dasharray: 160 468; animation: kf-ring-2-trace 20s ease-in-out infinite; }
 
-    .anim-seg-4-spark { animation: kf-seg-4-spark 6s linear infinite; }
-    .anim-seg-4-line { animation: kf-seg-4-line 6s linear infinite; }
-    .anim-box-5-glow { animation: kf-box-5-glow 6s ease-in-out infinite; }
-    .anim-ring-5 { stroke-dasharray: 140 400; animation: kf-ring-5-trace 6s ease-in-out infinite; }
+    .anim-seg-2-spark { animation: kf-seg-2-spark 20s linear infinite; }
+    .anim-seg-2-line  { animation: kf-seg-2-line 20s linear infinite; }
 
-    .anim-exit-spark { animation: kf-exit-spark 6s linear infinite; }
-    .anim-exit-line { animation: kf-exit-line 6s linear infinite; }
+    .anim-box-3-glow { animation: kf-box-3-glow 20s ease-in-out infinite; }
+    .anim-ring-3     { stroke-dasharray: 160 468; animation: kf-ring-3-trace 20s ease-in-out infinite; }
+
+    .anim-seg-3-spark { animation: kf-seg-3-spark 20s linear infinite; }
+    .anim-seg-3-line  { animation: kf-seg-3-line 20s linear infinite; }
+
+    .anim-box-4-glow { animation: kf-box-4-glow 20s ease-in-out infinite; }
+    .anim-ring-4     { stroke-dasharray: 160 468; animation: kf-ring-4-trace 20s ease-in-out infinite; }
+
+    .anim-seg-4-spark { animation: kf-seg-4-spark 20s linear infinite; }
+    .anim-seg-4-line  { animation: kf-seg-4-line 20s linear infinite; }
+
+    .anim-box-5-glow { animation: kf-box-5-glow 20s ease-in-out infinite; }
+    .anim-ring-5     { stroke-dasharray: 160 468; animation: kf-ring-5-trace 20s ease-in-out infinite; }
+
+    .anim-exit-spark { animation: kf-exit-spark 20s linear infinite; }
+    .anim-exit-line  { animation: kf-exit-line 20s linear infinite; }
   ]]></style>
 
   <!-- Background Canvas -->
-  <rect width="960" height="300" rx="14" fill="url(#pipe-bg)" stroke="rgba(255,255,255,0.08)" stroke-width="1.5" />
+  <rect width="1070" height="320" rx="16" fill="url(#pipe-bg)" stroke="rgba(255,255,255,0.08)" stroke-width="1.5" />
 
-  <!-- Passive Middle Conduit Line (Always Idle) -->
-  <line x1="20" y1="140" x2="940" y2="140" stroke="rgba(255,255,255,0.08)" stroke-width="3" stroke-linecap="round" />
+  <!-- Passive Middle Conduit Line (Subtle Ambient Warm Base) -->
+  <line x1="15" y1="145" x2="1055" y2="145" stroke="rgba(255,183,3,0.12)" stroke-width="3.5" stroke-linecap="round" />
 
-  <!-- Active Middle Connecting Line Segments (Light up sequentially) -->
-  <line x1="180" y1="140" x2="225" y2="140" stroke="#00e5ff" stroke-width="3.5" stroke-linecap="round" class="anim-seg-1-line" filter="url(#glow-cyan)" />
-  <line x1="365" y1="140" x2="410" y2="140" stroke="#a855f7" stroke-width="3.5" stroke-linecap="round" class="anim-seg-2-line" filter="url(#glow-purple)" />
-  <line x1="550" y1="140" x2="595" y2="140" stroke="#00e676" stroke-width="3.5" stroke-linecap="round" class="anim-seg-3-line" filter="url(#glow-green)" />
-  <line x1="735" y1="140" x2="780" y2="140" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round" class="anim-seg-4-line" filter="url(#glow-blue)" />
-  <line x1="920" y1="140" x2="945" y2="140" stroke="#ff5f56" stroke-width="3.5" stroke-linecap="round" class="anim-exit-line" filter="url(#glow-coral)" />
+  <!-- Active Middle Connecting Line Segments (Super Slow Incandescent Warm Glow) -->
+  <!-- Entry Line -->
+  <line x1="5" y1="145" x2="25" y2="145" stroke="#ffb703" stroke-width="4.5" stroke-linecap="round" class="anim-entry-line" filter="url(#glow-warm-line)" />
+  <!-- Segment 1: Box 1 to Box 2 -->
+  <line x1="189" y1="145" x2="239" y2="145" stroke="#ffb703" stroke-width="4.5" stroke-linecap="round" class="anim-seg-1-line" filter="url(#glow-warm-line)" />
+  <!-- Segment 2: Box 2 to Box 3 -->
+  <line x1="403" y1="145" x2="453" y2="145" stroke="#ffb703" stroke-width="4.5" stroke-linecap="round" class="anim-seg-2-line" filter="url(#glow-warm-line)" />
+  <!-- Segment 3: Box 3 to Box 4 -->
+  <line x1="617" y1="145" x2="667" y2="145" stroke="#ffb703" stroke-width="4.5" stroke-linecap="round" class="anim-seg-3-line" filter="url(#glow-warm-line)" />
+  <!-- Segment 4: Box 4 to Box 5 -->
+  <line x1="831" y1="145" x2="881" y2="145" stroke="#ffb703" stroke-width="4.5" stroke-linecap="round" class="anim-seg-4-line" filter="url(#glow-warm-line)" />
+  <!-- Exit Line -->
+  <line x1="1045" y1="145" x2="1065" y2="145" stroke="#ffb703" stroke-width="4.5" stroke-linecap="round" class="anim-exit-line" filter="url(#glow-warm-line)" />
 
-  <!-- Flowing Energy Sparks along Middle Conduit -->
+  <!-- Flowing Incandescent Warm Energy Sparks Along Middle Conduit -->
   <!-- Entry Spark -->
-  <g class="anim-entry-spark" transform="translate(0, 140)">
-    <circle cx="0" cy="0" r="5" fill="#ffffff" filter="url(#spark-glow)" />
-    <circle cx="0" cy="0" r="8" fill="#00e5ff" opacity="0.6" filter="url(#glow-cyan)" />
+  <g class="anim-entry-spark" transform="translate(0, 145)">
+    <circle cx="0" cy="0" r="6" fill="#ffffff" filter="url(#glow-warm-spark)" />
+    <circle cx="0" cy="0" r="11" fill="#ffb703" opacity="0.85" filter="url(#glow-warm-line)" />
   </g>
   <!-- Segment 1 Spark (Box 1 to Box 2) -->
-  <g class="anim-seg-1-spark" transform="translate(0, 140)">
-    <circle cx="0" cy="0" r="5" fill="#ffffff" filter="url(#spark-glow)" />
-    <circle cx="0" cy="0" r="9" fill="#00e5ff" opacity="0.7" filter="url(#glow-cyan)" />
+  <g class="anim-seg-1-spark" transform="translate(0, 145)">
+    <circle cx="0" cy="0" r="6" fill="#ffffff" filter="url(#glow-warm-spark)" />
+    <circle cx="0" cy="0" r="12" fill="#ffaa00" opacity="0.9" filter="url(#glow-warm-line)" />
+    <circle cx="0" cy="0" r="18" fill="#ff5500" opacity="0.4" filter="url(#glow-warm-line)" />
   </g>
   <!-- Segment 2 Spark (Box 2 to Box 3) -->
-  <g class="anim-seg-2-spark" transform="translate(0, 140)">
-    <circle cx="0" cy="0" r="5" fill="#ffffff" filter="url(#spark-glow)" />
-    <circle cx="0" cy="0" r="9" fill="#a855f7" opacity="0.7" filter="url(#glow-purple)" />
+  <g class="anim-seg-2-spark" transform="translate(0, 145)">
+    <circle cx="0" cy="0" r="6" fill="#ffffff" filter="url(#glow-warm-spark)" />
+    <circle cx="0" cy="0" r="12" fill="#ffaa00" opacity="0.9" filter="url(#glow-warm-line)" />
+    <circle cx="0" cy="0" r="18" fill="#ff5500" opacity="0.4" filter="url(#glow-warm-line)" />
   </g>
   <!-- Segment 3 Spark (Box 3 to Box 4) -->
-  <g class="anim-seg-3-spark" transform="translate(0, 140)">
-    <circle cx="0" cy="0" r="5" fill="#ffffff" filter="url(#spark-glow)" />
-    <circle cx="0" cy="0" r="9" fill="#00e676" opacity="0.7" filter="url(#glow-green)" />
+  <g class="anim-seg-3-spark" transform="translate(0, 145)">
+    <circle cx="0" cy="0" r="6" fill="#ffffff" filter="url(#glow-warm-spark)" />
+    <circle cx="0" cy="0" r="12" fill="#ffaa00" opacity="0.9" filter="url(#glow-warm-line)" />
+    <circle cx="0" cy="0" r="18" fill="#ff5500" opacity="0.4" filter="url(#glow-warm-line)" />
   </g>
   <!-- Segment 4 Spark (Box 4 to Box 5) -->
-  <g class="anim-seg-4-spark" transform="translate(0, 140)">
-    <circle cx="0" cy="0" r="5" fill="#ffffff" filter="url(#spark-glow)" />
-    <circle cx="0" cy="0" r="9" fill="#38bdf8" opacity="0.7" filter="url(#glow-blue)" />
+  <g class="anim-seg-4-spark" transform="translate(0, 145)">
+    <circle cx="0" cy="0" r="6" fill="#ffffff" filter="url(#glow-warm-spark)" />
+    <circle cx="0" cy="0" r="12" fill="#ffaa00" opacity="0.9" filter="url(#glow-warm-line)" />
+    <circle cx="0" cy="0" r="18" fill="#ff5500" opacity="0.4" filter="url(#glow-warm-line)" />
   </g>
   <!-- Exit Spark -->
-  <g class="anim-exit-spark" transform="translate(0, 140)">
-    <circle cx="0" cy="0" r="5" fill="#ffffff" filter="url(#spark-glow)" />
-    <circle cx="0" cy="0" r="9" fill="#ff5f56" opacity="0.7" filter="url(#glow-coral)" />
+  <g class="anim-exit-spark" transform="translate(0, 145)">
+    <circle cx="0" cy="0" r="6" fill="#ffffff" filter="url(#glow-warm-spark)" />
+    <circle cx="0" cy="0" r="12" fill="#ffb703" opacity="0.85" filter="url(#glow-warm-line)" />
   </g>
 
   <!-- ==========================================================
-       BLOCK 1: Phone / Tablet (Cyan Glow #00e5ff)
+       BLOCK 1: Phone / Tablet (Cyan Glow #00e5ff) - Width 164, Height 150
        ========================================================== -->
-  <g transform="translate(40, 75)">
-    <!-- Base Idle Block (Off State) -->
-    <rect width="140" height="130" rx="12" fill="#151720" stroke="rgba(0,229,255,0.2)" stroke-width="1.5" />
+  <g transform="translate(25, 70)">
+    <!-- Base Idle Block -->
+    <rect width="164" height="150" rx="14" fill="#131622" stroke="rgba(0,229,255,0.22)" stroke-width="1.8" />
     
     <!-- Active Illuminated Border Glow (Cyan) -->
-    <rect width="140" height="130" rx="12" fill="rgba(0,229,255,0.06)" stroke="#00e5ff" stroke-width="2.5" class="anim-box-1-glow" filter="url(#glow-cyan)" />
+    <rect width="164" height="150" rx="14" fill="rgba(0,229,255,0.07)" stroke="#00e5ff" stroke-width="3" class="anim-box-1-glow" filter="url(#glow-cyan)" />
     <!-- Outer Ring Tracing Lightning Arc -->
-    <rect width="140" height="130" rx="12" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" class="anim-ring-1" filter="url(#spark-glow)" />
+    <rect width="164" height="150" rx="14" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" class="anim-ring-1" filter="url(#glow-cyan)" />
 
-    <!-- Block Content -->
-    <rect x="10" y="10" width="28" height="28" rx="6" fill="rgba(0,229,255,0.15)" />
-    <text x="24" y="29" font-family="monospace" font-size="14" fill="#00e5ff" font-weight="bold" text-anchor="middle">1</text>
-    <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Phone / Tablet</text>
-    <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#00e5ff">Android &amp; iPad</text>
-    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">S Pen • Pencil • Touch</text>
-    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">240Hz Coalesced</text>
+    <!-- Block Badge -->
+    <rect x="14" y="14" width="32" height="32" rx="8" fill="rgba(0,229,255,0.18)" />
+    <text x="30" y="36" font-family="monospace" font-size="16" fill="#00e5ff" font-weight="bold" text-anchor="middle">1</text>
+    
+    <!-- Larger High-Legibility Typography -->
+    <text x="16" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#ffffff">Phone / Tablet</text>
+    <text x="16" y="94" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#00e5ff">Android &amp; iPad</text>
+    <text x="16" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" fill="#94a3b8">S Pen • Pencil • Touch</text>
+    <text x="16" y="134" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" fill="#94a3b8">240Hz Coalesced</text>
   </g>
 
   <!-- ==========================================================
-       BLOCK 2: 1-Euro Filter (Purple Glow #a855f7)
+       BLOCK 2: 1-Euro Filter (Purple Glow #a855f7) - Width 164, Height 150
        ========================================================== -->
-  <g transform="translate(225, 75)">
-    <!-- Base Idle Block (Off State) -->
-    <rect width="140" height="130" rx="12" fill="#151720" stroke="rgba(168,85,247,0.2)" stroke-width="1.5" />
+  <g transform="translate(239, 70)">
+    <!-- Base Idle Block -->
+    <rect width="164" height="150" rx="14" fill="#131622" stroke="rgba(168,85,247,0.22)" stroke-width="1.8" />
     
     <!-- Active Illuminated Border Glow (Purple) -->
-    <rect width="140" height="130" rx="12" fill="rgba(168,85,247,0.06)" stroke="#a855f7" stroke-width="2.5" class="anim-box-2-glow" filter="url(#glow-purple)" />
+    <rect width="164" height="150" rx="14" fill="rgba(168,85,247,0.07)" stroke="#c084fc" stroke-width="3" class="anim-box-2-glow" filter="url(#glow-purple)" />
     <!-- Outer Ring Tracing Lightning Arc -->
-    <rect width="140" height="130" rx="12" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" class="anim-ring-2" filter="url(#spark-glow)" />
+    <rect width="164" height="150" rx="14" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" class="anim-ring-2" filter="url(#glow-purple)" />
 
-    <!-- Block Content -->
-    <rect x="10" y="10" width="28" height="28" rx="6" fill="rgba(168,85,247,0.2)" />
-    <text x="24" y="29" font-family="monospace" font-size="14" fill="#a855f7" font-weight="bold" text-anchor="middle">2</text>
-    <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">1-Euro Filter</text>
-    <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#a855f7">Zero-Lag Smoothing</text>
-    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Adaptive Cutoff fc</text>
-    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Jitter Cancellation</text>
+    <!-- Block Badge -->
+    <rect x="14" y="14" width="32" height="32" rx="8" fill="rgba(168,85,247,0.2)" />
+    <text x="30" y="36" font-family="monospace" font-size="16" fill="#c084fc" font-weight="bold" text-anchor="middle">2</text>
+    
+    <!-- Larger High-Legibility Typography -->
+    <text x="16" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#ffffff">1-Euro Filter</text>
+    <text x="16" y="94" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#c084fc">Zero-Lag Smoothing</text>
+    <text x="16" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" fill="#94a3b8">Adaptive Cutoff fc</text>
+    <text x="16" y="134" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" fill="#94a3b8">Jitter Cancellation</text>
   </g>
 
   <!-- ==========================================================
-       BLOCK 3: 12-Byte Binary (Green Glow #00e676)
+       BLOCK 3: 12-Byte Binary (Green Glow #00e676) - Width 164, Height 150
        ========================================================== -->
-  <g transform="translate(410, 75)">
-    <!-- Base Idle Block (Off State) -->
-    <rect width="140" height="130" rx="12" fill="#151720" stroke="rgba(0,230,118,0.2)" stroke-width="1.5" />
+  <g transform="translate(453, 70)">
+    <!-- Base Idle Block -->
+    <rect width="164" height="150" rx="14" fill="#131622" stroke="rgba(0,230,118,0.22)" stroke-width="1.8" />
     
     <!-- Active Illuminated Border Glow (Green) -->
-    <rect width="140" height="130" rx="12" fill="rgba(0,230,118,0.06)" stroke="#00e676" stroke-width="2.5" class="anim-box-3-glow" filter="url(#glow-green)" />
+    <rect width="164" height="150" rx="14" fill="rgba(0,230,118,0.07)" stroke="#00e676" stroke-width="3" class="anim-box-3-glow" filter="url(#glow-green)" />
     <!-- Outer Ring Tracing Lightning Arc -->
-    <rect width="140" height="130" rx="12" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" class="anim-ring-3" filter="url(#spark-glow)" />
+    <rect width="164" height="150" rx="14" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" class="anim-ring-3" filter="url(#glow-green)" />
 
-    <!-- Block Content -->
-    <rect x="10" y="10" width="28" height="28" rx="6" fill="rgba(0,230,118,0.2)" />
-    <text x="24" y="29" font-family="monospace" font-size="14" fill="#00e676" font-weight="bold" text-anchor="middle">3</text>
-    <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">12-Byte Binary</text>
-    <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#00e676">Magic: 0xFACE</text>
-    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Universal Protocol</text>
-    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Zero Parsing Delay</text>
+    <!-- Block Badge -->
+    <rect x="14" y="14" width="32" height="32" rx="8" fill="rgba(0,230,118,0.2)" />
+    <text x="30" y="36" font-family="monospace" font-size="16" fill="#00e676" font-weight="bold" text-anchor="middle">3</text>
+    
+    <!-- Larger High-Legibility Typography -->
+    <text x="16" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#ffffff">12-Byte Binary</text>
+    <text x="16" y="94" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#00e676">Magic: 0xFACE</text>
+    <text x="16" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" fill="#94a3b8">Universal Protocol</text>
+    <text x="16" y="134" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" fill="#94a3b8">Zero Parsing Delay</text>
   </g>
 
   <!-- ==========================================================
-       BLOCK 4: Low-Latency Link (Blue Glow #38bdf8)
+       BLOCK 4: Low-Latency Link (Blue Glow #38bdf8) - Width 164, Height 150
        ========================================================== -->
-  <g transform="translate(595, 75)">
-    <!-- Base Idle Block (Off State) -->
-    <rect width="140" height="130" rx="12" fill="#151720" stroke="rgba(56,189,248,0.2)" stroke-width="1.5" />
+  <g transform="translate(667, 70)">
+    <!-- Base Idle Block -->
+    <rect width="164" height="150" rx="14" fill="#131622" stroke="rgba(56,189,248,0.22)" stroke-width="1.8" />
     
     <!-- Active Illuminated Border Glow (Blue) -->
-    <rect width="140" height="130" rx="12" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="2.5" class="anim-box-4-glow" filter="url(#glow-blue)" />
+    <rect width="164" height="150" rx="14" fill="rgba(56,189,248,0.07)" stroke="#38bdf8" stroke-width="3" class="anim-box-4-glow" filter="url(#glow-blue)" />
     <!-- Outer Ring Tracing Lightning Arc -->
-    <rect width="140" height="130" rx="12" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" class="anim-ring-4" filter="url(#spark-glow)" />
+    <rect width="164" height="150" rx="14" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" class="anim-ring-4" filter="url(#glow-blue)" />
 
-    <!-- Block Content -->
-    <rect x="10" y="10" width="28" height="28" rx="6" fill="rgba(56,189,248,0.2)" />
-    <text x="24" y="29" font-family="monospace" font-size="14" fill="#38bdf8" font-weight="bold" text-anchor="middle">4</text>
-    <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Low-Latency Link</text>
-    <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#38bdf8">TCP_NODELAY + UDP</text>
-    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Port 9877 WebSocket</text>
-    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Loopback Port 9876</text>
+    <!-- Block Badge -->
+    <rect x="14" y="14" width="32" height="32" rx="8" fill="rgba(56,189,248,0.2)" />
+    <text x="30" y="36" font-family="monospace" font-size="16" fill="#38bdf8" font-weight="bold" text-anchor="middle">4</text>
+    
+    <!-- Larger High-Legibility Typography -->
+    <text x="16" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#ffffff">Low-Latency Link</text>
+    <text x="16" y="94" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#38bdf8">TCP_NODELAY + UDP</text>
+    <text x="16" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" fill="#94a3b8">Port 9877 WebSocket</text>
+    <text x="16" y="134" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" fill="#94a3b8">Loopback Port 9876</text>
   </g>
 
   <!-- ==========================================================
-       BLOCK 5: Quartz Injection (Coral Glow #ff5f56)
+       BLOCK 5: Quartz Injection (Coral Glow #ff5f56) - Width 164, Height 150
        ========================================================== -->
-  <g transform="translate(780, 75)">
-    <!-- Base Idle Block (Off State) -->
-    <rect width="140" height="130" rx="12" fill="#151720" stroke="rgba(255,95,86,0.2)" stroke-width="1.5" />
+  <g transform="translate(881, 70)">
+    <!-- Base Idle Block -->
+    <rect width="164" height="150" rx="14" fill="#131622" stroke="rgba(255,95,86,0.22)" stroke-width="1.8" />
     
     <!-- Active Illuminated Border Glow (Coral) -->
-    <rect width="140" height="130" rx="12" fill="rgba(255,95,86,0.06)" stroke="#ff5f56" stroke-width="2.5" class="anim-box-5-glow" filter="url(#glow-coral)" />
+    <rect width="164" height="150" rx="14" fill="rgba(255,95,86,0.07)" stroke="#ff5f56" stroke-width="3" class="anim-box-5-glow" filter="url(#glow-coral)" />
     <!-- Outer Ring Tracing Lightning Arc -->
-    <rect width="140" height="130" rx="12" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" class="anim-ring-5" filter="url(#spark-glow)" />
+    <rect width="164" height="150" rx="14" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" class="anim-ring-5" filter="url(#glow-coral)" />
 
-    <!-- Block Content -->
-    <rect x="10" y="10" width="28" height="28" rx="6" fill="rgba(255,95,86,0.2)" />
-    <text x="24" y="29" font-family="monospace" font-size="14" fill="#ff5f56" font-weight="bold" text-anchor="middle">5</text>
-    <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Quartz Injection</text>
-    <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#ff5f56">kCGEventTabletPointer</text>
-    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Isolated EventSource</text>
-    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Photoshop • Krita • Blender</text>
+    <!-- Block Badge -->
+    <rect x="14" y="14" width="32" height="32" rx="8" fill="rgba(255,95,86,0.2)" />
+    <text x="30" y="36" font-family="monospace" font-size="16" fill="#ff5f56" font-weight="bold" text-anchor="middle">5</text>
+    
+    <!-- Larger High-Legibility Typography -->
+    <text x="16" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#ffffff">Quartz Injection</text>
+    <text x="16" y="94" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="600" fill="#ff5f56">kCGEventTabletPointer</text>
+    <text x="16" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" fill="#94a3b8">Isolated EventSource</text>
+    <text x="16" y="134" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.8" fill="#94a3b8">Photoshop • Krita • Blender</text>
   </g>
 
-  <!-- Latency Metric Footnote -->
-  <text x="480" y="255" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748b" text-anchor="middle">End-to-End Latency: <tspan fill="#00e676" font-weight="bold">0.8 ms – 1.4 ms</tspan> • Universal Compatibility on Any Mobile Device</text>
+  <!-- Latency Metric Footnote (Larger Font) -->
+  <text x="535" y="275" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" fill="#718096" text-anchor="middle">End-to-End Latency: <tspan fill="#00e676" font-weight="bold">0.8 ms – 1.4 ms</tspan> • Universal Compatibility on Any Mobile Device</text>
 </svg>
