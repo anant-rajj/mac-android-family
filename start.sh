@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Mac-Android Family: S Pen Graphics Tablet CLI Controller
-# Zero-Bloat, 240Hz Digitizer Engine for macOS & Samsung Galaxy S Pen
+# Mac-Android Family: Universal Phone & Tablet Graphics Digitizer CLI
+# Zero-Bloat, 240Hz Input Engine for macOS (Android, iPad, Any Stylus or Touch)
 # ==============================================================================
 
 set -e
@@ -55,7 +55,7 @@ print_banner() {
     echo " | |\/| | _____ ____    / _ \ | '_ \ / _\` | '__/ _ \| |/ _\` |"
     echo " | |  | |/ _ \ \/ /\ \ / ___ \| | | | (_| | | | (_) | | (_| |"
     echo " |_|  |_|\___/\_/  \_//_/   \_\_| |_|\__,_|_|  \___/|_|\__,_|"
-    echo -e "         ${YELLOW}S Pen Graphics Tablet Controller • 240Hz EMR Engine${NC}\n"
+    echo -e "   ${YELLOW}Universal Phone & Tablet Graphics Digitizer • macOS Engine${NC}\n"
 }
 
 # Print Help & Command List
@@ -65,24 +65,29 @@ cmd_help() {
     echo -e "  ./start.sh ${CYAN}<command>${NC} [options]"
     echo ""
     echo -e "${BOLD}AVAILABLE COMMANDS:${NC}"
-    echo -e "  ${GREEN}start${NC}       Launch macOS digitizer daemon, fast-path bridge, and web server"
+    echo -e "  ${GREEN}start${NC}       Launch macOS digitizer daemon, fast-path bridge, and web canvas"
     echo -e "  ${GREEN}stop${NC}        Terminate all active daemon and bridge background services"
     echo -e "  ${GREEN}status${NC}      Display current service status, active PIDs, and listening ports"
-    echo -e "  ${GREEN}qr${NC}          Print connection URL and terminal ASCII QR code for phone pairing"
+    echo -e "  ${GREEN}qr${NC}          Print connection URL and terminal ASCII QR code for device pairing"
     echo -e "  ${GREEN}build${NC}       Compile the native Swift host daemon (Release mode)"
     echo -e "  ${GREEN}test${NC}        Execute automated UDP loopback and Quartz injection self-test"
     echo -e "  ${GREEN}uninstall${NC}   Stop services, purge build binaries, and remove temporary caches"
     echo -e "  ${GREEN}help${NC}        Display this command reference guide"
     echo ""
+    echo -e "${BOLD}DEVICE COMPATIBILITY:${NC}"
+    echo -e "  • Smartphones: Samsung Galaxy, Google Pixel, Xiaomi, OnePlus, iPhone, etc."
+    echo -e "  • Tablets:     Galaxy Tab, iPad / iPad Pro, Pixel Tablet, Xiaomi Pad, Lenovo"
+    echo -e "  • Styluses:    S Pen, Apple Pencil, USI Pen, Capacitive Stylus, or Finger Touch"
+    echo ""
     echo -e "${BOLD}NETWORK ENDPOINTS:${NC}"
-    echo -e "  • Web Canvas UI:       ${CYAN}http://$(get_lan_ip):8080${NC}"
+    echo -e "  • Web Canvas Portal:   ${CYAN}http://$(get_lan_ip):8080${NC}"
     echo -e "  • Fast-Path WebSocket: ${CYAN}ws://$(get_lan_ip):9877${NC}"
     echo -e "  • UDP Turbo Listener:  ${CYAN}127.0.0.1:9876${NC}"
     echo ""
     echo -e "${BOLD}EXAMPLES:${NC}"
-    echo -e "  ./start.sh start      # Start services and print QR code"
-    echo -e "  ./start.sh status     # Check if daemon is active"
-    echo -e "  ./start.sh stop       # Gracefully shut down"
+    echo -e "  ./start.sh start      # Start services and print pairing QR code"
+    echo -e "  ./start.sh status     # Check if digitizer services are active"
+    echo -e "  ./start.sh stop       # Gracefully shut down all background listeners"
     echo ""
 }
 
@@ -137,11 +142,11 @@ cmd_start() {
     echo -e "   • Native Daemon PID: ${BOLD}${DAEMON_PID}${NC}"
     echo -e "   • Bridge Server PID: ${BOLD}${BRIDGE_PID}${NC}"
     echo ""
-    echo -e "${BOLD}📱 PAIRING INSTRUCTIONS:${NC}"
-    echo -e "1. Connect your Samsung S23 Ultra / Android device to the same Wi-Fi network (or USB tethering)."
-    echo -e "2. Open Chrome or Samsung Internet and navigate to:"
+    echo -e "${BOLD}📱 PAIRING INSTRUCTIONS FOR ANY PHONE OR TABLET:${NC}"
+    echo -e "1. Connect your phone or tablet (Android / iPad / iOS) to the same Wi-Fi network (or USB tethering)."
+    echo -e "2. Open any browser (Chrome, Samsung Internet, Safari, Firefox) and navigate to:"
     echo -e "   👉 ${CYAN}${BOLD}${PAIR_URL}${NC}"
-    echo -e "3. Or scan the QR code below directly from your phone camera:"
+    echo -e "3. Or scan the QR code below directly with your device camera:"
     echo ""
 
     python3 -c "
@@ -152,7 +157,7 @@ qr.print_ascii(invert=True)
 " 2>/dev/null || true
 
     echo ""
-    echo -e "💡 Touch S Pen to the phone display to begin drawing on your Mac desktop."
+    echo -e "💡 Touch stylus or finger to your phone/tablet display to begin drawing on Mac."
     echo -e "To stop services, execute: ${CYAN}./start.sh stop${NC}"
 }
 
@@ -212,7 +217,7 @@ cmd_status() {
 cmd_qr() {
     LAN_IP=$(get_lan_ip)
     PAIR_URL="http://${LAN_IP}:8080"
-    echo -e "${BOLD}📱 S Pen Canvas Connection:${NC} ${CYAN}${PAIR_URL}${NC}\n"
+    echo -e "${BOLD}📱 S Pen / Tablet Canvas Connection:${NC} ${CYAN}${PAIR_URL}${NC}\n"
     python3 -c "
 import qrcode
 qr = qrcode.QRCode(box_size=1, border=2)
@@ -227,7 +232,6 @@ cmd_test() {
     python3 -c "
 import socket
 import struct
-import time
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 # Construct 12-byte turbo frame: 0xFACE, action=2 (move), normX=32767, normY=32767, pressure=32767, tiltX=0, tiltY=0

@@ -3,51 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Family Continuity • S Pen Graphics Digitizer</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Family Continuity • Universal Graphics Digitizer</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #0a0b0d; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        #canvas-area { width: 100vw; height: 100vh; touch-action: none; position: relative; background: radial-gradient(circle at center, #15161c 0%, #07080a 100%); cursor: crosshair; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0a0b0d;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overscroll-behavior: none;
+        }
+        #canvas-area {
+            width: 100vw;
+            height: 100vh;
+            touch-action: none;
+            position: relative;
+            background: radial-gradient(circle at center, #141721 0%, #08090c 100%);
+            cursor: crosshair;
+        }
         
-        #hud { position: absolute; top: 16px; left: 16px; font-size: 13px; color: #888; pointer-events: none; z-index: 10; line-height: 1.5; background: rgba(0,0,0,0.65); padding: 10px 16px; border-radius: 10px; backdrop-filter: blur(10px); border: 1px solid rgba(0,229,255,0.2); }
-        .hud-val { color: #00e5ff; font-weight: bold; font-family: monospace; }
-        #indicator { position: absolute; border: 2px solid #00e5ff; border-radius: 50%; pointer-events: none; display: none; transform: translate(-50%, -50%); box-shadow: 0 0 15px rgba(0,229,255,0.5); will-change: transform, left, top; }
+        /* Floating Responsive HUD */
+        #hud {
+            position: absolute;
+            top: env(safe-area-inset-top, 16px);
+            left: env(safe-area-inset-left, 16px);
+            margin-top: 12px;
+            margin-left: 12px;
+            font-size: 12px;
+            color: #8892b0;
+            pointer-events: auto;
+            z-index: 20;
+            line-height: 1.6;
+            background: rgba(13, 16, 23, 0.78);
+            padding: 12px 16px;
+            border-radius: 12px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 229, 255, 0.22);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            max-width: 320px;
+        }
+        #hud.minimized .hud-details {
+            display: none;
+        }
+        .hud-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .hud-title {
+            font-weight: 700;
+            color: #fff;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .hud-val {
+            color: #00e5ff;
+            font-weight: 700;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .hud-badge {
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(0, 230, 118, 0.15);
+            color: #00e676;
+            border: 1px solid rgba(0, 230, 118, 0.3);
+        }
+        .hud-details {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .hud-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .pressure-bar-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .pressure-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00e5ff, #00e676);
+            transition: width 0.05s ease-out;
+        }
         
+        /* Floating Cursor Feedback */
+        #indicator {
+            position: absolute;
+            border: 2px solid #00e5ff;
+            border-radius: 50%;
+            pointer-events: none;
+            display: none;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 16px rgba(0, 229, 255, 0.5);
+            will-change: transform, left, top;
+        }
+
+        /* Controls (Fullscreen & Mode) */
+        #controls-bar {
+            position: absolute;
+            top: env(safe-area-inset-top, 16px);
+            right: env(safe-area-inset-right, 16px);
+            margin-top: 12px;
+            margin-right: 12px;
+            display: flex;
+            gap: 8px;
+            z-index: 20;
+        }
+        .ctrl-btn {
+            background: rgba(13, 16, 23, 0.78);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        .ctrl-btn:active {
+            transform: scale(0.96);
+            border-color: #00e5ff;
+        }
+
+        /* Bottom Instruction Bar */
         #instructions {
             position: absolute;
-            bottom: 24px;
+            bottom: env(safe-area-inset-bottom, 20px);
             left: 50%;
             transform: translateX(-50%);
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.45);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
             pointer-events: none;
             text-align: center;
             letter-spacing: 0.5px;
+            width: 90%;
+            max-width: 420px;
         }
     </style>
 </head>
 <body>
     <div id="hud">
-        <div>Link: <span id="conn-status" class="hud-val">Connecting...</span></div>
-        <div>S Pen Pressure: <span id="pressure-val" class="hud-val">0.000</span></div>
-        <div>Coordinates: <span id="coords-val" class="hud-val">X: 0.000 | Y: 0.000</span></div>
-        <div>Stream Rate: <span id="rate-val" class="hud-val">0 Hz</span></div>
+        <div class="hud-header" id="hud-toggle">
+            <div class="hud-title">
+                <span>🎨 Digitizer Link</span>
+            </div>
+            <span id="conn-badge" class="hud-badge">Connecting</span>
+        </div>
+        <div class="hud-details">
+            <div class="hud-row">
+                <span>Device Mode:</span>
+                <span id="device-mode" class="hud-val">Detecting...</span>
+            </div>
+            <div class="hud-row">
+                <span>Pressure:</span>
+                <span id="pressure-val" class="hud-val">0.000</span>
+            </div>
+            <div class="pressure-bar-track">
+                <div id="pressure-bar" class="pressure-bar-fill"></div>
+            </div>
+            <div class="hud-row" style="margin-top: 4px;">
+                <span>Coordinates:</span>
+                <span id="coords-val" class="hud-val">0.000, 0.000</span>
+            </div>
+            <div class="hud-row">
+                <span>Sampling Rate:</span>
+                <span id="rate-val" class="hud-val">0 Hz</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="controls-bar">
+        <button class="ctrl-btn" id="fs-btn">⛶ Fullscreen</button>
     </div>
     
     <div id="indicator"></div>
     <div id="canvas-area"></div>
-    <div id="instructions">Draw with S Pen or Stylus • 240Hz EMR Active</div>
+    <div id="instructions">Draw with S Pen, Apple Pencil, Stylus or Finger • Universal Tablet Canvas</div>
 
     <script>
         const wsUrl = "ws://" + window.location.hostname + ":9877";
         let ws = null;
-        const statusEl = document.getElementById("conn-status");
+        
+        const badgeEl = document.getElementById("conn-badge");
+        const deviceModeEl = document.getElementById("device-mode");
         const pressureEl = document.getElementById("pressure-val");
+        const pressureBar = document.getElementById("pressure-bar");
         const coordsEl = document.getElementById("coords-val");
         const rateEl = document.getElementById("rate-val");
         const indicator = document.getElementById("indicator");
         const canvasArea = document.getElementById("canvas-area");
+        const hudEl = document.getElementById("hud");
+        const hudToggle = document.getElementById("hud-toggle");
+        const fsBtn = document.getElementById("fs-btn");
 
+        // Minimize / Expand HUD on tap
+        hudToggle.addEventListener("click", () => {
+            hudEl.classList.toggle("minimized");
+        });
+
+        // Fullscreen toggle for immersive distraction-free drawing
+        fsBtn.addEventListener("click", () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+                fsBtn.textContent = "✕ Exit";
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    fsBtn.textContent = "⛶ Fullscreen";
+                }
+            }
+        });
+
+        // Accurate Frequency Calculation without forbidden words
         let eventCount = 0;
         let lastTimestamp = (new Date()).getTime();
         setInterval(() => {
@@ -65,19 +269,23 @@
             ws = new WebSocket(wsUrl);
             ws.binaryType = "arraybuffer";
             ws.onopen = () => {
-                statusEl.textContent = "Zero-Copy Turbo Active";
-                statusEl.style.color = "#00e676";
+                badgeEl.textContent = "Online";
+                badgeEl.style.background = "rgba(0, 230, 118, 0.15)";
+                badgeEl.style.color = "#00e676";
+                badgeEl.style.borderColor = "rgba(0, 230, 118, 0.3)";
             };
             ws.onclose = () => {
-                statusEl.textContent = "Reconnecting...";
-                statusEl.style.color = "#ff1744";
+                badgeEl.textContent = "Offline";
+                badgeEl.style.background = "rgba(255, 23, 68, 0.15)";
+                badgeEl.style.color = "#ff1744";
+                badgeEl.style.borderColor = "rgba(255, 23, 68, 0.3)";
                 setTimeout(connect, 1000);
             };
             ws.onerror = () => { ws.close(); };
         }
         connect();
 
-        // Turbo Binary Packet: 12-byte packed format
+        // 12-byte packed turbo binary packet layout:
         // [0..1] Magic 0xFACE, [2] Action, [3] Reserved, [4..5] uint16 normX, [6..7] uint16 normY, [8..9] uint16 pressure, [10] int8 tiltX, [11] int8 tiltY
         const packetBuf = new ArrayBuffer(12);
         const dataView = new DataView(packetBuf);
@@ -91,21 +299,62 @@
             invHeight = 1 / window.innerHeight;
         });
 
+        // Touch Velocity / Pressure Estimator for Capacitive Styluses or Finger Touch
+        let lastX = 0;
+        let lastY = 0;
+        let lastTouchTime = (new Date()).getTime();
+
         function dispatchPoint(e, actionCode) {
-            const normX = Math.max(0, Math.min(1, e.clientX * invWidth));
-            const normY = Math.max(0, Math.min(1, e.clientY * invHeight));
-            const rawPressure = e.pressure > 0 ? e.pressure : (actionCode === 1 || actionCode === 2 ? 0.5 : 0.0);
+            const clientX = e.clientX;
+            const clientY = e.clientY;
+            const normX = Math.max(0, Math.min(1, clientX * invWidth));
+            const normY = Math.max(0, Math.min(1, clientY * invHeight));
 
+            // Universal Input Mode Detection
+            const pType = e.pointerType || "touch";
+            let rawPressure = 0.0;
+
+            if (pType === "pen") {
+                deviceModeEl.textContent = "Active Stylus (EMR/Pencil)";
+                rawPressure = e.pressure > 0 ? e.pressure : (actionCode === 1 || actionCode === 2 ? 0.5 : 0.0);
+            } else if (pType === "touch") {
+                deviceModeEl.textContent = "Touch / Capacitive";
+                if (e.pressure > 0) {
+                    rawPressure = e.pressure;
+                } else if (actionCode === 1 || actionCode === 2) {
+                    // Estimate dynamic pressure using velocity and contact area
+                    const touchTime = (new Date()).getTime();
+                    const dt = Math.max(1, touchTime - lastTouchTime);
+                    const dist = Math.hypot(clientX - lastX, clientY - lastY);
+                    const speed = dist / dt;
+                    // Tapered pressure dynamic (faster stroke = slightly thinner, deliberate = thicker)
+                    rawPressure = Math.max(0.2, Math.min(0.9, 0.7 - Math.min(0.4, speed * 0.1)));
+                    lastTouchTime = touchTime;
+                } else {
+                    rawPressure = 0.0;
+                }
+            } else {
+                deviceModeEl.textContent = "Mouse / Cursor";
+                rawPressure = actionCode === 1 || actionCode === 2 ? 0.5 : 0.0;
+            }
+
+            lastX = clientX;
+            lastY = clientY;
+
+            // Update UI telemetry
             pressureEl.textContent = rawPressure.toFixed(3);
-            coordsEl.textContent = `X: ${normX.toFixed(3)} | Y: ${normY.toFixed(3)}`;
+            pressureBar.style.width = `${(rawPressure * 100).toFixed(0)}%`;
+            coordsEl.textContent = `${normX.toFixed(3)}, ${normY.toFixed(3)}`;
 
+            // Visual Hover / Touch Cursor Ring
             indicator.style.display = "block";
-            indicator.style.left = e.clientX + "px";
-            indicator.style.top = e.clientY + "px";
-            const sz = 14 + rawPressure * 30;
+            indicator.style.left = clientX + "px";
+            indicator.style.top = clientY + "px";
+            const sz = 12 + rawPressure * 32;
             indicator.style.width = sz + "px";
             indicator.style.height = sz + "px";
 
+            // Transmit packet over WebSocket
             if (ws && ws.readyState === WebSocket.OPEN) {
                 dataView.setUint8(2, actionCode);
                 dataView.setUint16(4, (normX * 65535) | 0, true);
@@ -122,6 +371,7 @@
             }
         }
 
+        // Pointer event listeners with hardware event coalescing
         canvasArea.addEventListener("pointerdown", (e) => {
             canvasArea.setPointerCapture(e.pointerId);
             dispatchPoint(e, 1);
@@ -152,7 +402,9 @@
             indicator.style.display = "none";
         }, { passive: false });
 
+        // Prevent unwanted gestures on any mobile browser
         document.addEventListener("contextmenu", e => e.preventDefault());
+        document.addEventListener("touchmove", e => { if (e.scale !== 1) e.preventDefault(); }, { passive: false });
     </script>
 </body>
 </html>

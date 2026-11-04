@@ -18,7 +18,7 @@
       <stop offset="100%" stop-color="#00e5ff" />
     </linearGradient>
 
-    <!-- Device Frame Shadow -->
+    <!-- Glow & Shadow Filters -->
     <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur stdDeviation="8" result="blur" />
       <feMerge>
@@ -60,11 +60,6 @@
       100% { stroke-dashoffset: 0; opacity: 0.2; }
     }
 
-    @keyframes pulse-glow {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 0.9; }
-    }
-
     @keyframes stroke-draw {
       0% { stroke-dashoffset: 600; }
       100% { stroke-dashoffset: 0; }
@@ -91,10 +86,6 @@
       animation: packet-stream 2s linear infinite;
     }
 
-    .glow-element {
-      animation: pulse-glow 3s ease-in-out infinite;
-    }
-
     .animated-drawing {
       stroke-dasharray: 600;
       animation: stroke-draw 5s ease-in-out infinite;
@@ -117,49 +108,48 @@
     <line x1="0" y1="320" x2="960" y2="320" />
   </g>
 
-  <!-- LEFT: Samsung Galaxy S23 Ultra Device -->
-  <g transform="translate(60, 45)" filter="url(#soft-shadow)">
-    <!-- Outer Frame (S23 Ultra Boxy Angular Edges) -->
-    <rect width="250" height="330" rx="18" fill="#181a20" stroke="#323742" stroke-width="2.5" />
-    <!-- Dynamic Curved OLED Display -->
-    <rect width="234" height="314" x="8" y="8" rx="12" fill="#0c0e12" stroke="rgba(0,229,255,0.25)" stroke-width="1.2" />
-    <!-- Top Speaker Ear-piece & Punch-hole Camera -->
-    <circle cx="125" cy="22" r="4.5" fill="#1e222b" stroke="#3a4050" stroke-width="1" />
-    <circle cx="125" cy="22" r="1.8" fill="#00e5ff" opacity="0.6" />
+  <!-- LEFT: Universal Tablet / Phone Device -->
+  <g transform="translate(50, 45)" filter="url(#soft-shadow)">
+    <!-- Universal Tablet Frame (Slim Bezel Aluminum) -->
+    <rect width="270" height="330" rx="18" fill="#181a20" stroke="#323742" stroke-width="2.5" />
+    <!-- Dynamic OLED / Retina Display -->
+    <rect width="254" height="314" x="8" y="8" rx="12" fill="#0c0e12" stroke="rgba(0,229,255,0.25)" stroke-width="1.2" />
+    <!-- Front Sensor Punch-hole -->
+    <circle cx="135" cy="22" r="4.5" fill="#1e222b" stroke="#3a4050" stroke-width="1" />
+    <circle cx="135" cy="22" r="1.8" fill="#00e5ff" opacity="0.6" />
 
-    <!-- Active Canvas Pattern on Phone -->
-    <path d="M 30,100 Q 80,60 140,110 T 210,180 T 130,260 T 60,200" fill="none" stroke="rgba(0, 229, 255, 0.4)" stroke-width="3" stroke-linecap="round" class="animated-drawing" />
+    <!-- Active Canvas Pattern on Phone/Tablet -->
+    <path d="M 35,100 Q 90,60 150,110 T 225,180 T 145,260 T 70,200" fill="none" stroke="rgba(0, 229, 255, 0.4)" stroke-width="3" stroke-linecap="round" class="animated-drawing" />
 
-    <!-- Device Badge -->
-    <rect x="24" y="280" width="110" height="24" rx="6" fill="rgba(0,0,0,0.6)" stroke="rgba(0,229,255,0.3)" stroke-width="1" />
-    <text x="32" y="296" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#00e5ff">240Hz EMR • S23U</text>
+    <!-- Device Compatibility Badge -->
+    <rect x="20" y="280" width="230" height="26" rx="6" fill="rgba(0,0,0,0.65)" stroke="rgba(0,229,255,0.3)" stroke-width="1" />
+    <text x="135" y="297" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#00e5ff" text-anchor="middle">Any Phone / Tablet • Android &amp; iPad</text>
   </g>
 
   <!-- MIDDLE: Animated Fast-Path Transmission Tunnel -->
-  <g transform="translate(325, 140)">
+  <g transform="translate(335, 140)">
     <!-- Connecting Laser Tunnel Paths -->
-    <path d="M 0,40 C 90,0 120,80 220,40" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2" />
-    <path d="M 0,40 C 90,0 120,80 220,40" fill="none" stroke="url(#neon-cyan)" stroke-width="3.5" class="packet-line" filter="url(#glow-cyan)" />
+    <path d="M 0,40 C 90,0 120,80 210,40" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2" />
+    <path d="M 0,40 C 90,0 120,80 210,40" fill="none" stroke="url(#neon-cyan)" stroke-width="3.5" class="packet-line" filter="url(#glow-cyan)" />
     
-    <path d="M 0,70 C 90,110 120,30 220,70" fill="none" stroke="url(#neon-purple)" stroke-width="2.5" class="packet-line" />
+    <path d="M 0,70 C 90,110 120,30 210,70" fill="none" stroke="url(#neon-purple)" stroke-width="2.5" class="packet-line" />
 
     <!-- Center Bridge Badge -->
-    <g transform="translate(70, 22)">
+    <g transform="translate(65, 22)">
       <rect width="84" height="48" rx="10" fill="rgba(18, 21, 30, 0.9)" stroke="rgba(0,229,255,0.4)" stroke-width="1.5" />
       <text x="42" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="800" fill="#8892b0" text-anchor="middle">SUB-MS LINK</text>
       <text x="42" y="38" font-family="-apple-system, BlinkMacSystemFont, monospace" font-size="13" font-weight="900" fill="#00e676" text-anchor="middle">&lt; 1.2 ms</text>
     </g>
 
-    <text x="110" y="105" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">12-Byte Turbo UDP / WS</text>
+    <text x="105" y="105" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">Universal 12-Byte Frame</text>
   </g>
 
   <!-- RIGHT: macOS MacBook Pro Window & Native Canvas -->
   <g transform="translate(560, 45)" filter="url(#soft-shadow)">
-    <!-- MacBook Aluminum Chassis -->
+    <!-- MacBook Chassis -->
     <rect width="340" height="330" rx="14" fill="#16181f" stroke="#2e3442" stroke-width="2.5" />
     <!-- Window Title Bar -->
     <path d="M 0,14 C 0,6 6,0 14,0 L 326,0 C 334,0 340,6 340,14 L 340,36 L 0,36 Z" fill="#20242e" />
-    <!-- macOS Traffic Light Buttons -->
     <circle cx="18" cy="18" r="5" fill="#ff5f56" />
     <circle cx="34" cy="18" r="5" fill="#ffbd2e" />
     <circle cx="50" cy="18" r="5" fill="#27c93f" />
@@ -168,35 +158,31 @@
     <!-- Canvas Inner Viewport -->
     <rect width="324" height="278" x="8" y="44" rx="8" fill="#090a0f" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
 
-    <!-- Synced Artistic Drawing on Mac Screen -->
+    <!-- Synced Drawing on Mac Screen -->
     <path d="M 50,110 Q 120,70 190,120 T 270,190 T 170,260 T 90,210" fill="none" stroke="url(#neon-cyan)" stroke-width="4.5" stroke-linecap="round" class="animated-drawing" filter="url(#glow-cyan)" />
 
-    <!-- Dock/Status Bar simulation at bottom -->
+    <!-- Status Bar at bottom -->
     <rect x="18" y="284" width="304" height="28" rx="6" fill="rgba(255,255,255,0.04)" />
     <text x="28" y="302" font-family="-apple-system, BlinkMacSystemFont, monospace" font-size="11" fill="#00e5ff">PRESSURE: 0.842 • TILT: -14° • 4096 LVLS</text>
   </g>
 
-  <!-- ANIMATED STYLUS ON PHONE -->
+  <!-- ANIMATED STYLUS / PEN -->
   <g class="stylus-group">
     <!-- Pressure Wave Pulses -->
     <circle cx="0" cy="0" fill="none" stroke="#00e5ff" class="pulse-ring-1" />
     <circle cx="0" cy="0" fill="none" stroke="#00e676" class="pulse-ring-2" />
     
-    <!-- S Pen Body -->
+    <!-- Stylus Body -->
     <path d="M 0,0 L -12,-30 L -16,-140 L -6,-142 L -2,-30 Z" fill="#242833" stroke="#4a5266" stroke-width="1.5" />
-    <!-- S Pen Tip -->
     <polygon points="0,0 -4,-12 4,-12" fill="#00e5ff" filter="url(#glow-cyan)" />
-    <!-- S Pen Button Accent -->
     <rect x="-8" y="-70" width="4" height="18" rx="1.5" fill="#00e676" />
   </g>
 
   <!-- ANIMATED CURSOR ON MAC -->
   <g class="mac-cursor">
-    <!-- Precision Crosshair -->
     <circle cx="0" cy="0" r="10" fill="rgba(0,229,255,0.18)" stroke="#00e5ff" stroke-width="1.8" />
     <line x1="-16" y1="0" x2="16" y2="0" stroke="#00e5ff" stroke-width="1.5" />
     <line x1="0" y1="-16" x2="0" y2="16" stroke="#00e5ff" stroke-width="1.5" />
     <circle cx="0" cy="0" r="2.5" fill="#ffffff" />
   </g>
-
 </svg>

@@ -1,21 +1,22 @@
 <div align="center">
 
 # Mac-Android Family
-### Universal S Pen Graphics Digitizer for macOS & Samsung Galaxy Devices
+### Universal Phone & Tablet Graphics Digitizer for macOS
 
-[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Android-black?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/anant-rajj/mac-android-family)
-[![Frequency](https://img.shields.io/badge/Sampling-240Hz%20EMR-00e5ff?style=for-the-badge)](https://github.com/anant-rajj/mac-android-family)
-[![Latency](https://img.shields.io/badge/Latency-%3C1.2ms%20Turbo-00e676?style=for-the-badge)](https://github.com/anant-rajj/mac-android-family)
-[![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](LICENSE)
-
-<br/>
-
-**Transform your Samsung Galaxy S23 Ultra (or any S Pen device) into a high-precision, pressure-sensitive graphics tablet for Mac.**  
-Engineered with sub-millisecond event synthesis, native Quartz tablet taps, and zero-overhead binary streaming.
+[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Android%20%7C%20iPadOS-black?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/anant-rajj/mac-android-family)
+[![Device Support](https://img.shields.io/badge/Devices-Any%20Phone%20or%20Tablet-purple?style=for-the-badge)](https://github.com/anant-rajj/mac-android-family)
+[![Stylus Support](https://img.shields.io/badge/Stylus-S%20Pen%20%7C%20Apple%20Pencil%20%7C%20USI%20%7C%20Touch-00e5ff?style=for-the-badge)](https://github.com/anant-rajj/mac-android-family)
+[![Sampling](https://img.shields.io/badge/Sampling-240Hz%20Coalesced-00e676?style=for-the-badge)](https://github.com/anant-rajj/mac-android-family)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 <br/>
 
-![S Pen Digitizer Live Continuity](assets/spen_digitizer_animation.svg)
+**Transform ANY Android smartphone, tablet, or Apple iPad into a high-precision, pressure-sensitive graphics tablet for Mac.**  
+Engineered with sub-millisecond event synthesis, native Apple Quartz tablet taps, and zero-overhead binary streaming.
+
+<br/>
+
+![Universal Digitizer Live Continuity](assets/spen_digitizer_animation.svg)
 
 </div>
 
@@ -23,6 +24,7 @@ Engineered with sub-millisecond event synthesis, native Quartz tablet taps, and 
 
 ## 📑 Table of Contents
 
+- [Universal Device & Stylus Support](#-universal-device--stylus-support)
 - [System Architecture](#-system-architecture)
 - [Core Capabilities](#-core-capabilities)
 - [Data Pipeline](#-data-pipeline)
@@ -36,19 +38,32 @@ Engineered with sub-millisecond event synthesis, native Quartz tablet taps, and 
 
 ---
 
+## 📱 Universal Device & Stylus Support
+
+Mac-Android Family is built from the ground up to support **any mobile phone or tablet** running a modern web browser or Android runtime:
+
+| Category | Supported Hardware | Input Capabilities | Connection Mode |
+| :--- | :--- | :--- | :--- |
+| **Samsung Galaxy Devices** | Galaxy S21/S22/S23/S24 Ultra, Galaxy Note series, Z Fold series | S Pen (240Hz EMR, 4,096 Pressure Steps, Dual Tilt) | Browser / Native App |
+| **Android Tablets** | Galaxy Tab S7/S8/S9/S10, Xiaomi Pad, OnePlus Pad, Lenovo Tab | S Pen, Xiaomi Smart Pen, USI Stylus, Capacitive Pen | Browser / Native App |
+| **Apple iPad & iPad Pro** | iPad Pro, iPad Air, iPad mini, Standard iPad | Apple Pencil 1 / 2 / Pro, Tilt, Pressure, Touch | Safari Browser (Zero-Install) |
+| **Android Smartphones** | Google Pixel, Xiaomi, OnePlus, Motorola, Nothing Phone, etc. | Active Stylus, Capacitive Pen, or Finger Touch Drawing | Chrome / Web Browser |
+
+---
+
 ## 🏛️ System Architecture
 
-Mac-Android Family bridges Android hardware digitizers to macOS WindowServer. By tapping directly into the electromagnetic resonance (EMR) sensor array on Samsung Galaxy devices, the engine captures raw stylus signals at **240 samples per second** with **4,096 distinct pressure steps** and **dual-axis tilt coordinates**.
+Mac-Android Family bridges mobile touchscreens and digitizers directly into macOS WindowServer. By intercepting raw hardware coordinates, the engine routes events through a high-frequency low-pass filter and synthesizes standard HID tablet events directly into the macOS operating system:
 
 ```
-[ Samsung S23 Ultra / S Pen ]
-         │  (240Hz EMR Sensor Sampling)
+[ Any Mobile Device (Phone / Tablet / iPad) ]
+         │  (S Pen / Apple Pencil / Stylus / Touch)
          ▼
-[ 1-Euro Adaptive Filter ]
-         │  (Jitter-Free Signal Smoothing)
+[ 1-Euro Adaptive Low-Pass Filter ]
+         │  (Jitter Cancellation & Smoothing)
          ▼
 [ 12-Byte Turbo Binary Frame (0xFACE) ]
-         │  (Zero-Copy WebSocket / UDP Transport)
+         │  (Zero-Copy WebSocket / UDP Loopback)
          ▼
 [ Swift Native Daemon (family-daemon) ]
          │  (Isolated CGEventSource State)
@@ -63,19 +78,21 @@ Mac-Android Family bridges Android hardware digitizers to macOS WindowServer. By
 
 ## ✨ Core Capabilities
 
-- **240Hz Hardware EMR Ingress**: Utilizes hardware coalesced event extraction (`getCoalescedEvents()`) to eliminate input dropouts during rapid brush strokes.
-- **4,096-Step Pressure Dynamic**: Translates raw digitizer force directly into native macOS tablet pointer events (`kCGEventTabletPointer`).
+- **Universal Multi-Input Detection**: Intelligently switches between Active Styluses (EMR / Apple Pencil), Capacitive Pens, and Touch input modes.
+- **240Hz Coalesced Event Extraction**: Leverages `getCoalescedEvents()` across browsers to capture micro-movements between standard screen refresh ticks.
+- **4,096 Hardware Pressure Steps**: Passes true pressure values directly to macOS `kCGEventTabletPointer` attributes.
+- **Dynamic Touch Pressure Emulation**: When using a capacitive stylus or finger on devices without pressure sensors, the engine calculates smooth, dynamic stroke weighting based on speed and contact area.
 - **Dual-Axis Tilt Tracking**: Full support for stylus altitude and azimuth angle tracking (-60° to +60°).
-- **Sub-Millisecond 1-Euro Filter**: Employs an adaptive cutoff frequency filter ($f_c = f_{c,\min} + \beta \cdot |\dot{x}|$) that dampens static hand tremor while maintaining zero lag during fast movement.
-- **Turbo 12-Byte Wire Format**: Transmits packed integer structures over binary WebSockets (`TCP_NODELAY`) and loopback UDP, eliminating JSON serialisation latency.
-- **Isolated Quartz Event Source**: Synthesizes synthetic HID events through an isolated `CGEventSource(.privateState)` to prevent modifier key latching bugs.
-- **Zero-Install Web Client**: Pair instantly through Chrome or Samsung Internet with zero mobile application installation required.
+- **Sub-Millisecond 1-Euro Filter**: An adaptive cutoff filter ($f_c = f_{c,\min} + \beta \cdot |\dot{x}|$) that stabilizes stationary precision work while remaining instant during fast sketching.
+- **Turbo 12-Byte Wire Format**: Packed binary format over WebSockets with `TCP_NODELAY`, bypassing heavy JSON parsers.
+- **Isolated Quartz Event Tap**: Uses a private `CGEventSource` state to prevent modifier key latching bugs across macOS.
+- **Zero-Install Web Portal**: Instant pairing via any mobile browser (Chrome, Safari, Samsung Internet, Edge, Firefox).
 
 ---
 
 ## ⚡ Data Pipeline
 
-The pipeline processes input packets from physical stylus tip touch down to the macOS desktop in under 1.2 milliseconds:
+The pipeline processes input packets from physical glass contact to macOS brush strokes in under 1.2 milliseconds:
 
 <br/>
 
@@ -85,10 +102,10 @@ The pipeline processes input packets from physical stylus tip touch down to the 
 
 | Stage | Component | Latency Overhead | Description |
 | :--- | :--- | :--- | :--- |
-| **Stage 1** | Samsung Wacom EMR | ~0.2 ms | Coalesced hardware pointer polling at 240Hz |
-| **Stage 2** | 1-Euro Adaptive Filter | ~0.1 ms | Adaptive cutoff frequency smoothing |
-| **Stage 3** | Turbo Binary Frame | ~0.1 ms | Packed 12-byte struct with `0xFACE` magic header |
-| **Stage 4** | WebSocket / UDP Bridge | ~0.4 ms | Kernel socket streaming with disabled Nagle algorithm |
+| **Stage 1** | Mobile Screen Ingress | ~0.2 ms | Coalesced hardware pointer polling on phone or tablet |
+| **Stage 2** | 1-Euro Adaptive Filter | ~0.1 ms | Dynamic cutoff frequency smoothing and jitter removal |
+| **Stage 3** | Turbo Binary Frame | ~0.1 ms | Packed 12-byte struct with `0xFACE` validation header |
+| **Stage 4** | WebSocket / UDP Bridge | ~0.4 ms | Kernel socket streaming with disabled buffering |
 | **Stage 5** | Quartz Event Tap | ~0.3 ms | Direct injection into macOS WindowServer event tap |
 | **Total** | **End-to-End** | **&lt; 1.2 ms** | **Zero perceptible lag for professional illustration** |
 
@@ -107,18 +124,19 @@ cd mac-android-family
 
 ### Option 2: Direct Archive Download
 
-1. Download the source archive from GitHub:
-   ```bash
-   curl -L -o mac-android-family.zip https://github.com/anant-rajj/mac-android-family/archive/refs/heads/main.zip
-   unzip mac-android-family.zip
-   cd mac-android-family-main
-   ```
+Download and unpack the latest repository package:
+
+```bash
+curl -L -o mac-android-family.zip https://github.com/anant-rajj/mac-android-family/archive/refs/heads/main.zip
+unzip mac-android-family.zip
+cd mac-android-family-main
+```
 
 ### Prerequisites Check
 
 The project runs on standard macOS developer tooling:
 - **macOS**: Version 12.0 or later (Apple Silicon M-series or Intel).
-- **Swift Toolchain**: Included by default with Xcode or Command Line Tools (`xcode-select --install`).
+- **Swift Toolchain**: Included with Xcode or Command Line Tools (`xcode-select --install`).
 - **Python**: Version 3.8+ (pre-installed on macOS).
 - **Python Dependencies**:
   ```bash
@@ -145,45 +163,45 @@ Inside the project directory, run the primary launcher:
 ./start.sh start
 ```
 
-*(Alternatively, use the convenience shortcut `./family start`)*.
+*(Or use the convenience alias `./family start`)*.
 
-The system will automatically:
-1. Verify and compile the native Swift daemon in release mode if not already compiled.
+The system will:
+1. Verify and compile the native Swift daemon in release mode if needed.
 2. Spin up the native Quartz tablet daemon (`family-daemon`).
 3. Start the low-latency WebSocket fast-path bridge and static canvas server.
 4. Display your local connection URL and render a scannable terminal ASCII QR code.
 
-### Step 2: Connect Your S Pen Device
+### Step 2: Connect Your Device (Phone, Tablet, or iPad)
 
-1. Ensure your Samsung Galaxy S23 Ultra (or Android tablet) is on the same Wi-Fi network as your Mac.
-2. Open your mobile browser (**Samsung Internet** or **Google Chrome**).
-3. Scan the terminal QR code with your phone camera, or manually navigate to the URL shown in terminal:
+1. Ensure your phone or tablet is on the same local Wi-Fi network as your Mac.
+2. Open any web browser on your device (**Safari** on iPad/iPhone, **Chrome** or **Samsung Internet** on Android).
+3. Scan the terminal QR code with your camera, or navigate to:
    ```
    http://<mac-ip-address>:8080
    ```
-4. The canvas interface opens instantly with an active link badge.
+4. The canvas interface opens instantly with an active link badge. Tap **Fullscreen** for an edge-to-edge drawing canvas.
 
 > [!TIP]
-> **Optional USB Wired Mode**: For zero-wireless interference, connect your phone via USB cable, enable USB debugging, and forward ports:
+> **Optional Wired USB Tethering**: On Android, connect a USB cable and run:
 > ```bash
 > adb forward tcp:8080 tcp:8080
 > adb forward tcp:9877 tcp:9877
 > ```
-> Then browse to `http://localhost:8080` on your phone.
+> Then open `http://localhost:8080` on your mobile browser for zero-wireless interference.
 
 ### Step 3: Draw in Any Creative Suite
 
-Touch your S Pen to the phone glass. The cursor on your Mac tracks your stylus in real-time. Launch your creative application of choice:
-- **Krita**: Full 4,096 pressure sensitivity and brush dynamics.
-- **Adobe Photoshop**: Natural brush stroke weight and opacity modulation.
-- **Blender**: Pressure-sensitive 2D Grease Pencil and 3D sculpting.
-- **Affinity Designer / Photo**: Vector tablet stroke stabilization.
+Touch your stylus or finger to your mobile screen. Your Mac cursor tracks your hand movements across the display:
+- **Krita**: Full pressure sensitivity, tilt brush dynamics, and stroke stabilization.
+- **Adobe Photoshop**: Natural brush stroke weight, opacity, and angle shading.
+- **Blender**: 2D Grease Pencil sketching and 3D surface sculpting.
+- **Affinity Designer / Photo**: Vector tablet stroke styling and pressure curves.
 
 ---
 
 ## 💻 Command-Line Interface
 
-The repository provides a lightweight CLI manager (`./start.sh` or `./family`) to control all runtime operations:
+The repository provides an interactive CLI tool (`./start.sh` or `./family`) to control all operations:
 
 ```
   __  __                  _              _           _     _ 
@@ -191,7 +209,7 @@ The repository provides a lightweight CLI manager (`./start.sh` or `./family`) t
  | |\/| | _____ ____    / _ \ | '_ \ / _` | '__/ _ \| |/ _` |
  | |  | |/ _ \ \/ /\ \ / ___ \| | | | (_| | | | (_) | | (_| |
  |_|  |_|\___/\_/  \_//_/   \_\_| |_|\__,_|_|  \___/|_|\__,_|
-         S Pen Graphics Tablet Controller • 240Hz EMR Engine
+   Universal Phone & Tablet Graphics Digitizer • macOS Engine
 ```
 
 ### Command Reference
@@ -267,7 +285,7 @@ If you wish to remove the granted Accessibility permission on your Mac:
 
 - **Magic Word**: `0xFACE` (2 bytes) for instantaneous packet boundary validation.
 - **Action Codes**: `0` = Hover, `1` = Stylus Down, `2` = Stylus Drag/Move, `3` = Stylus Up.
-- **Normalized Coordinates**: Linear fixed-point mapped to $[0, 65535]$.
+- **Normalized Coordinates**: Linear fixed-point mapped to $[0, 65535]$ matching any screen ratio.
 - **Pressure Resolution**: 16-bit integer mapped to $[0, 65535]$ matching 4,096 physical levels.
 - **Tilt Vectors**: Signed 8-bit integers representing degrees from vertical plane.
 
@@ -288,20 +306,20 @@ $$\alpha = \frac{1}{1 + \frac{\tau}{T_e}}, \quad \tau = \frac{1}{2\pi f_c}, \qua
 
 ## 📂 Repository Structure
 
-The repository maintains a clean, minimalist layout free of extraneous dependencies:
+The repository maintains a clean, minimalist layout:
 
 ```
 mac-android-family/
 ├── assets/                                 # Visual graphics and animated diagrams
-│   ├── spen_digitizer_animation.svg        # Stylus to Mac live continuity animation
+│   ├── spen_digitizer_animation.svg        # Universal tablet to Mac continuity animation
 │   ├── data_pipeline_animation.svg         # 5-stage architectural pipeline animation
 │   └── terminal_cli_animation.svg          # Terminal CLI interactive demonstration
 ├── android_client/                         # Native Android Kotlin implementation
-│   ├── AndroidManifest.xml                 # Minimal manifest (Internet permissions)
+│   ├── AndroidManifest.xml                 # Sensor-adaptive orientation manifest
 │   ├── build.gradle.kts                    # Gradle build definition
 │   └── app/src/main/kotlin/.../
 │       ├── MainActivity.kt                 # Fullscreen immersive drawing activity
-│       ├── SpenCaptureView.kt              # S Pen event listener with 1-Euro filter
+│       ├── SpenCaptureView.kt              # Multi-touch event listener with 1-Euro filter
 │       └── TelemetryClient.kt              # UDP socket packet serializer
 ├── docs/                                   # Research logs and performance reports
 │   ├── family.md                           # Protocol design specifications
@@ -313,7 +331,7 @@ mac-android-family/
 │       ├── main.swift                      # Daemon entrypoint and signal handling
 │       ├── NetworkServer.swift             # High-throughput UDP packet parser
 │       └── QuartzTabletBridge.swift        # Apple Quartz event tap synthesizer
-├── web_client/                             # Zero-install browser digitizer portal
+├── web_client/                             # Universal zero-install browser digitizer
 │   └── index.html                          # 240Hz pointer canvas and binary streamer
 ├── start.sh                                # Unified CLI manager (start/stop/status)
 ├── family                                  # Symlink to start.sh for easy terminal access
