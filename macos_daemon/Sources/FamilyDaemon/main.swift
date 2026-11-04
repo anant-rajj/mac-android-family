@@ -4,16 +4,22 @@ import AppKit
 @main
 struct FamilyDaemonApp {
     static func main() {
-        print("🚀 [FamilyDaemon] Starting Family Continuity Engine for macOS...")
+        print("🎨 [FamilyDaemon] Initializing macOS S Pen Graphics Tablet Engine...")
         
         let server = NetworkServer()
         server.start()
         
-        ClipboardBridge.shared.startMonitoring { newText in
-            print("📋 [ClipboardBridge] Local macOS clipboard changed (\(newText.count) chars), broadcasting to S23 Ultra...")
+        // Setup graceful UNIX signal handling for clean terminal exit
+        signal(SIGINT) { _ in
+            print("\n🛑 [FamilyDaemon] Terminating gracefully...")
+            exit(0)
+        }
+        signal(SIGTERM) { _ in
+            print("\n🛑 [FamilyDaemon] Terminating gracefully...")
+            exit(0)
         }
         
-        print("🟢 [FamilyDaemon] Running. Listening for S23 Ultra S Pen telemetry...")
+        print("🟢 [FamilyDaemon] Online. Receiving 240Hz S Pen telemetry via UDP on port 9876.")
         RunLoop.current.run()
     }
 }

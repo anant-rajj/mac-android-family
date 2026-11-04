@@ -3,28 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Family S Pen Pro (Zero-Copy)</title>
+    <title>Family Continuity • S Pen Graphics Digitizer</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
         body, html { width: 100%; height: 100%; overflow: hidden; background: #0a0b0d; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        #canvas-area { width: 100vw; height: 100vh; touch-action: none; position: relative; background: radial-gradient(circle at center, #15161c 0%, #07080a 100%); }
+        #canvas-area { width: 100vw; height: 100vh; touch-action: none; position: relative; background: radial-gradient(circle at center, #15161c 0%, #07080a 100%); cursor: crosshair; }
+        
         #hud { position: absolute; top: 16px; left: 16px; font-size: 13px; color: #888; pointer-events: none; z-index: 10; line-height: 1.5; background: rgba(0,0,0,0.65); padding: 10px 16px; border-radius: 10px; backdrop-filter: blur(10px); border: 1px solid rgba(0,229,255,0.2); }
         .hud-val { color: #00e5ff; font-weight: bold; font-family: monospace; }
         #indicator { position: absolute; border: 2px solid #00e5ff; border-radius: 50%; pointer-events: none; display: none; transform: translate(-50%, -50%); box-shadow: 0 0 15px rgba(0,229,255,0.5); will-change: transform, left, top; }
-        #badge { position: absolute; bottom: 16px; right: 16px; background: rgba(0,229,255,0.15); border: 1px solid rgba(0,229,255,0.3); color: #00e5ff; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; pointer-events: none; }
+        
+        #instructions {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.45);
+            pointer-events: none;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
     </style>
 </head>
 <body>
     <div id="hud">
         <div>Link: <span id="conn-status" class="hud-val">Connecting...</span></div>
         <div>S Pen Pressure: <span id="pressure-val" class="hud-val">0.000</span></div>
-        <div>Coords: <span id="coords-val" class="hud-val">X: 0.000 | Y: 0.000</span></div>
-        <div>Engine Rate: <span id="rate-val" class="hud-val">0 Hz</span></div>
+        <div>Coordinates: <span id="coords-val" class="hud-val">X: 0.000 | Y: 0.000</span></div>
+        <div>Stream Rate: <span id="rate-val" class="hud-val">0 Hz</span></div>
     </div>
     
     <div id="indicator"></div>
     <div id="canvas-area"></div>
-    <div id="badge">⚡ Zero-Copy 12-Byte Int16 Telemetry</div>
+    <div id="instructions">Draw with S Pen or Stylus • 240Hz EMR Active</div>
 
     <script>
         const wsUrl = "ws://" + window.location.hostname + ":9877";
@@ -37,20 +49,23 @@
         const canvasArea = document.getElementById("canvas-area");
 
         let eventCount = 0;
-        let lastTime = performance.now();
+        let lastTimestamp = (new Date()).getTime();
         setInterval(() => {
-            const now = performance.now();
-            const hz = Math.round((eventCount * 1000) / (now - lastTime));
-            rateEl.textContent = `${hz} Hz`;
+            const currentTimestamp = (new Date()).getTime();
+            const elapsed = currentTimestamp - lastTimestamp;
+            if (elapsed > 0) {
+                const hz = Math.round((eventCount * 1000) / elapsed);
+                rateEl.textContent = `${hz} Hz`;
+            }
             eventCount = 0;
-            lastTime = now;
+            lastTimestamp = currentTimestamp;
         }, 1000);
 
         function connect() {
             ws = new WebSocket(wsUrl);
             ws.binaryType = "arraybuffer";
             ws.onopen = () => {
-                statusEl.textContent = "Zero-Copy Turbo Active ✅";
+                statusEl.textContent = "Zero-Copy Turbo Active";
                 statusEl.style.color = "#00e676";
             };
             ws.onclose = () => {
@@ -62,14 +77,8 @@
         }
         connect();
 
-        // 12-Byte Packed Integer Layout:
-        // [0..1] Magic (0xFA 0xCE)
-        // [2] Action (0=Hover, 1=Down, 2=Move, 3=Up)
-        // [3] Reserved
-        // [4..5] uint16 xNorm (0..65535)
-        // [6..7] uint16 yNorm (0..65535)
-        // [8..9] uint16 pressure (0..65535)
-        // [10..11] int16 tilt (tiltX << 8 | tiltY)
+        // Turbo Binary Packet: 12-byte packed format
+        // [0..1] Magic 0xFACE, [2] Action, [3] Reserved, [4..5] uint16 normX, [6..7] uint16 normY, [8..9] uint16 pressure, [10] int8 tiltX, [11] int8 tiltY
         const packetBuf = new ArrayBuffer(12);
         const dataView = new DataView(packetBuf);
         dataView.setUint8(0, 0xFA);
@@ -144,7 +153,6 @@
         }, { passive: false });
 
         document.addEventListener("contextmenu", e => e.preventDefault());
-        document.addEventListener("touchstart", e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
     </script>
 </body>
 </html>

@@ -53,7 +53,7 @@ flowchart LR
 
 2. **Kernel-Level `TCP_NODELAY` (Disabling Nagle's Algorithm)**:
    - By default, TCP delays small network packets (like our 23-byte telemetry frame) for 10–30 ms to batch them into larger MTU segments.
-   - Updated [`bridge_server.py`](file:///Users/anantraj/Desktop/family/macos_daemon/bridge_server.py#L32-L41) to enable `socket.TCP_NODELAY = 1` directly on the active socket transport. Packets now bypass the operating system queue and hit the network instantly.
+   - Updated [`bridge_server.py`](file:///Users/anantraj/Desktop/family/macos_daemon/bridge_server.py#L32-L41) to enable `socket.TCP_NODELAY = 1` directly on the active socket transport. Packets bypass the operating system queue and hit the network instantly.
 
 3. **Zero-Allocation Fixed Binary Memory Layout**:
    - Eliminated dynamic object creation on every stroke. Replaced with a single pre-allocated 23-byte `ArrayBuffer` and `DataView` reused across millions of coordinates. Zero garbage collection pauses.

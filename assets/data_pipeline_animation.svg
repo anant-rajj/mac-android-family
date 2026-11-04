@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="pipe-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0c10" />
+      <stop offset="100%" stop-color="#10131a" />
+    </linearGradient>
+
+    <linearGradient id="glow-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00e5ff" />
+      <stop offset="50%" stop-color="#7c4dff" />
+      <stop offset="100%" stop-color="#00e676" />
+    </linearGradient>
+
+    <filter id="node-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <style>
+    @keyframes flow-pulse {
+      0% { stroke-dashoffset: 240; }
+      100% { stroke-dashoffset: 0; }
+    }
+
+    @keyframes node-activate {
+      0%, 100% { stroke: rgba(0, 229, 255, 0.4); }
+      50% { stroke: #00e676; filter: drop-shadow(0 0 8px rgba(0,230,118,0.6)); }
+    }
+
+    @keyframes particle-run {
+      0% { transform: translateX(0px); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateX(760px); opacity: 0; }
+    }
+
+    .pipeline-wire {
+      stroke-dasharray: 8 10;
+      animation: flow-pulse 1.8s linear infinite;
+    }
+
+    .pulsing-node {
+      animation: node-activate 3s ease-in-out infinite;
+    }
+
+    .moving-packet {
+      animation: particle-run 2.2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+    }
+  </style>
+
+  <!-- Background -->
+  <rect width="960" height="300" rx="14" fill="url(#pipe-bg)" stroke="rgba(255,255,255,0.08)" stroke-width="1.5" />
+
+  <!-- Main Pipeline Conduit -->
+  <line x1="100" y1="140" x2="860" y2="140" stroke="rgba(255,255,255,0.1)" stroke-width="4" stroke-linecap="round" />
+  <line x1="100" y1="140" x2="860" y2="140" stroke="url(#glow-grad)" stroke-width="4" stroke-linecap="round" class="pipeline-wire" filter="url(#node-glow)" />
+
+  <!-- Flowing Data Particles -->
+  <g class="moving-packet" transform="translate(100, 140)">
+    <circle cx="0" cy="0" r="6" fill="#ffffff" filter="url(#node-glow)" />
+    <circle cx="-12" cy="0" r="3.5" fill="#00e5ff" opacity="0.8" />
+    <circle cx="-22" cy="0" r="2" fill="#7c4dff" opacity="0.5" />
+  </g>
+
+  <!-- STAGE 1: S Pen EMR -->
+  <g transform="translate(40, 75)">
+    <rect width="140" height="130" rx="12" fill="#151720" stroke="rgba(0,229,255,0.4)" stroke-width="1.8" class="pulsing-node" />
+    <rect x="10" y="10" width="28" height="28" rx="6" fill="rgba(0,229,255,0.15)" />
+    <text x="24" y="29" font-family="monospace" font-size="14" fill="#00e5ff" font-weight="bold" text-anchor="middle">1</text>
+    <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Wacom EMR</text>
+    <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#00e5ff">240Hz Sampling</text>
+    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Coalesced Events</text>
+    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">4096 Press. Levels</text>
+  </g>
+
+  <!-- STAGE 2: 1-Euro Filter -->
+  <g transform="translate(225, 75)">
+    <rect width="140" height="130" rx="12" fill="#151720" stroke="rgba(0,229,255,0.4)" stroke-width="1.8" class="pulsing-node" />
+    <rect x="10" y="10" width="28" height="28" rx="6" fill="rgba(124,77,255,0.2)" />
+    <text x="24" y="29" font-family="monospace" font-size="14" fill="#7c4dff" font-weight="bold" text-anchor="middle">2</text>
+    <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">1-Euro Filter</text>
+    <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#7c4dff">Zero-Lag Smoothing</text>
+    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Adaptive Cutoff fc</text>
+    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Jitter Cancellation</text>
+  </g>
+
+  <!-- STAGE 3: Turbo 12-Byte Frame -->
+  <g transform="translate(410, 75)">
+    <rect width="140" height="130" rx="12" fill="#151720" stroke="rgba(0,229,255,0.4)" stroke-width="1.8" class="pulsing-node" />
+    <rect x="10" y="10" width="28" height="28" rx="6" fill="rgba(0,230,118,0.2)" />
+    <text x="24" y="29" font-family="monospace" font-size="14" fill="#00e676" font-weight="bold" text-anchor="middle">3</text>
+    <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">12-Byte Binary</text>
+    <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#00e676">Magic: 0xFACE</text>
+    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Zero JSON Parsing</text>
+    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Packed Integer Struct</text>
+  </g>
+
+  <!-- STAGE 4: Zero-Copy Bridge -->
+  <g transform="translate(595, 75)">
+    <rect width="140" height="130" rx="12" fill="#151720" stroke="rgba(0,229,255,0.4)" stroke-width="1.8" class="pulsing-node" />
+    <rect x="10" y="10" width="28" height="28" rx="6" fill="rgba(0,229,255,0.2)" />
+    <text x="24" y="29" font-family="monospace" font-size="14" fill="#00e5ff" font-weight="bold" text-anchor="middle">4</text>
+    <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Low-Latency Link</text>
+    <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#00e5ff">TCP_NODELAY + UDP</text>
+    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Port 9877 WebSocket</text>
+    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Loopback Port 9876</text>
+  </g>
+
+  <!-- STAGE 5: Apple Quartz Event Tap -->
+  <g transform="translate(780, 75)">
+    <rect width="140" height="130" rx="12" fill="#151720" stroke="rgba(0,229,255,0.4)" stroke-width="1.8" class="pulsing-node" />
+    <rect x="10" y="10" width="28" height="28" rx="6" fill="rgba(255,107,107,0.2)" />
+    <text x="24" y="29" font-family="monospace" font-size="14" fill="#ff6b6b" font-weight="bold" text-anchor="middle">5</text>
+    <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Quartz Injection</text>
+    <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#ff6b6b">kCGEventTabletPointer</text>
+    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Isolated EventSource</text>
+    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Krita • Photoshop</text>
+  </g>
+
+  <!-- Latency Metric Footnote -->
+  <text x="480" y="255" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748b" text-anchor="middle">End-to-End Latency: <tspan fill="#00e676" font-weight="bold">0.8 ms – 1.4 ms</tspan> • Zero Perceptible Input Lag</text>
+</svg>
