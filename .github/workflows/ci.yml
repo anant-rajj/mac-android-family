@@ -1,0 +1,22 @@
+name: Scripts & Python Syntax Validation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: macos-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate Shell Scripts
+        run: |
+          bash -n install.sh uninstall.sh mac-and
+
+      - name: Validate Python Daemon
+        run: |
+          python3 -m py_compile macos_daemon/bridge_server.py
