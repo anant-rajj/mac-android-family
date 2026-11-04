@@ -207,12 +207,12 @@ Touch your stylus or finger to your mobile screen. Your Mac cursor tracks your h
 The project includes the unified `mac-and` command line tool:
 
 ```
- __  __    _    ____       _    _   _ ____  
-|  \/  |  / \  / ___|     / \  | \ | |  _ \ 
-| |\/| | / _ \| |   _____/ _ \ |  \| | | | |
-| |  | |/ ___ \ |__|_____/ ___ \| |\  | |_| |
-|_|  |_/_/   \_\____|   /_/   \_\_| \_|____/ 
-   Universal Phone & Tablet Graphics Digitizer • macOS Engine
+      __  __    _     ____          _    _   _ ____  
+     |  \/  |  / \   / ___|  ____  / \  | \ | |  _ \ 
+     | |\/| | / _ \ | |     |____|/ _ \ |  \| | | | |
+     | |  | |/ ___ \| |___       / ___ \| |\  | |_| |
+     |_|  |_/_/   \_\____|      /_/   \_\_| \_|____/ 
+        Universal Phone & Tablet Graphics Digitizer • macOS Engine
 ```
 
 ### Command Reference
@@ -227,17 +227,17 @@ The project includes the unified `mac-and` command line tool:
 | **Compile Daemon** | `mac-and build` | Compiles native Swift daemon using `swift build -c release` |
 | **Loopback Test** | `mac-and test` | Injects synthetic 12-byte stylus frame to verify Quartz tap functionality |
 | **Install Global CLI** | `mac-and install` | Links `mac-and` to `~/.local/bin/mac-and` for access from any directory |
-| **Uninstall** | `mac-and uninstall` | Stops services, cleans binary build trees, and removes global CLI link |
+| **Uninstall** | `mac-and uninstall` | Total self-erasure: stops services, purges footprints, and deletes repository |
 
 ---
 
 ## 🗑️ How to Uninstall
 
-Uninstallation is simple and immediate:
+Uninstallation implements complete self-erasure. True to the principle that an eraser erasing everything must erase itself too, running the uninstaller cleans all traces, memory, and footprints:
 
-### Method 1: Single-Command Uninstallation
+### Total Self-Erasure
 
-Run the uninstaller directly from anywhere in your terminal:
+Run the uninstaller directly from your terminal:
 
 ```bash
 mac-and uninstall
@@ -245,27 +245,14 @@ mac-and uninstall
 
 *(Or execute `./uninstall.sh` inside the repository)*.
 
-This command will:
-1. Terminate all active daemon processes and bridge listeners.
-2. Release network ports (`8080`, `9876`, `9877`).
-3. Remove the global CLI shortcut (`~/.local/bin/mac-and`).
-4. Purge compiled Swift binaries (`macos_daemon/.build`).
-5. Delete runtime PID files and temporary pairing caches.
+This command performs end-to-end self-erasure:
+1. **Stops Active Daemons**: Shuts down background Swift daemon and Python bridge processes.
+2. **Releases System Ports**: Frees network ports (`8080`, `9876`, `9877`).
+3. **Erases CLI Shortcuts**: Removes global links from `~/.local/bin/mac-and` and `/usr/local/bin/mac-and`.
+4. **Purges Build & Cache Footprints**: Cleans runtime PID files, cache directories, and build artifacts.
+5. **Erases the Repository Itself**: Asynchronously deletes the cloned repository directory, leaving zero leftover footprints on your system.
 
-### Method 2: Complete Project Directory Removal
-
-To delete the repository folder completely from your machine:
-
-```bash
-# 1. Cleanly stop services and unregister CLI
-mac-and uninstall
-
-# 2. Delete the directory
-cd ..
-rm -rf mac-android-family
-```
-
-### Method 3: Revoke macOS Accessibility Permissions
+### Revoking macOS Accessibility Permissions
 
 If you wish to remove the granted Accessibility permission on your Mac:
 1. Open **System Settings** on macOS.

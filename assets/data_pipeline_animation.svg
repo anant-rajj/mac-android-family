@@ -31,14 +31,10 @@
     </filter>
   </defs>
 
-  <style>
-    /* ==========================================================
-       6-SECOND CHOREOGRAPHED ENERGY CYCLE
-       Line -> Box 1 -> Line -> Box 2 -> Line -> Box 3
-            -> Line -> Box 4 -> Line -> Box 5 -> Exit -> Reset
-       ========================================================== */
+  <style><![CDATA[
+    /* 6-SECOND CHOREOGRAPHED ENERGY CYCLE */
 
-    /* STAGE 1: ENTRY & BOX 1 (Cyan #00e5ff) */
+    /* STAGE 1: ENTRY AND BOX 1 (Cyan #00e5ff) */
     @keyframes kf-entry-spark {
       0% { transform: translateX(15px); opacity: 0; }
       0.5% { opacity: 1; transform: translateX(15px); }
@@ -58,7 +54,7 @@
       16%, 100% { stroke-dashoffset: 0; opacity: 0; }
     }
 
-    /* SEGMENT 1: BOX 1 -> BOX 2 (16% - 22%) */
+    /* SEGMENT 1: BOX 1 TO BOX 2 (16% - 22%) */
     @keyframes kf-seg-1-spark {
       0%, 15.5% { transform: translateX(180px); opacity: 0; }
       16% { opacity: 1; transform: translateX(180px); }
@@ -85,7 +81,7 @@
       35%, 100% { stroke-dashoffset: 0; opacity: 0; }
     }
 
-    /* SEGMENT 2: BOX 2 -> BOX 3 (35% - 41%) */
+    /* SEGMENT 2: BOX 2 TO BOX 3 (35% - 41%) */
     @keyframes kf-seg-2-spark {
       0%, 34.5% { transform: translateX(365px); opacity: 0; }
       35% { opacity: 1; transform: translateX(365px); }
@@ -112,7 +108,7 @@
       54%, 100% { stroke-dashoffset: 0; opacity: 0; }
     }
 
-    /* SEGMENT 3: BOX 3 -> BOX 4 (54% - 60%) */
+    /* SEGMENT 3: BOX 3 TO BOX 4 (54% - 60%) */
     @keyframes kf-seg-3-spark {
       0%, 53.5% { transform: translateX(550px); opacity: 0; }
       54% { opacity: 1; transform: translateX(550px); }
@@ -139,7 +135,7 @@
       73%, 100% { stroke-dashoffset: 0; opacity: 0; }
     }
 
-    /* SEGMENT 4: BOX 4 -> BOX 5 (73% - 79%) */
+    /* SEGMENT 4: BOX 4 TO BOX 5 (73% - 79%) */
     @keyframes kf-seg-4-spark {
       0%, 72.5% { transform: translateX(735px); opacity: 0; }
       73% { opacity: 1; transform: translateX(735px); }
@@ -166,7 +162,7 @@
       92%, 100% { stroke-dashoffset: 0; opacity: 0; }
     }
 
-    /* EXIT SEGMENT: BOX 5 -> END (92% - 96%) */
+    /* EXIT SEGMENT: BOX 5 TO END (92% - 96%) */
     @keyframes kf-exit-spark {
       0%, 91.5% { transform: translateX(920px); opacity: 0; }
       92% { opacity: 1; transform: translateX(920px); }
@@ -206,7 +202,7 @@
 
     .anim-exit-spark { animation: kf-exit-spark 6s linear infinite; }
     .anim-exit-line { animation: kf-exit-line 6s linear infinite; }
-  </style>
+  ]]></style>
 
   <!-- Background Canvas -->
   <rect width="960" height="300" rx="14" fill="url(#pipe-bg)" stroke="rgba(255,255,255,0.08)" stroke-width="1.5" />
@@ -227,22 +223,22 @@
     <circle cx="0" cy="0" r="5" fill="#ffffff" filter="url(#spark-glow)" />
     <circle cx="0" cy="0" r="8" fill="#00e5ff" opacity="0.6" filter="url(#glow-cyan)" />
   </g>
-  <!-- Segment 1 Spark (Box 1 -> Box 2) -->
+  <!-- Segment 1 Spark (Box 1 to Box 2) -->
   <g class="anim-seg-1-spark" transform="translate(0, 140)">
     <circle cx="0" cy="0" r="5" fill="#ffffff" filter="url(#spark-glow)" />
     <circle cx="0" cy="0" r="9" fill="#00e5ff" opacity="0.7" filter="url(#glow-cyan)" />
   </g>
-  <!-- Segment 2 Spark (Box 2 -> Box 3) -->
+  <!-- Segment 2 Spark (Box 2 to Box 3) -->
   <g class="anim-seg-2-spark" transform="translate(0, 140)">
     <circle cx="0" cy="0" r="5" fill="#ffffff" filter="url(#spark-glow)" />
     <circle cx="0" cy="0" r="9" fill="#a855f7" opacity="0.7" filter="url(#glow-purple)" />
   </g>
-  <!-- Segment 3 Spark (Box 3 -> Box 4) -->
+  <!-- Segment 3 Spark (Box 3 to Box 4) -->
   <g class="anim-seg-3-spark" transform="translate(0, 140)">
     <circle cx="0" cy="0" r="5" fill="#ffffff" filter="url(#spark-glow)" />
     <circle cx="0" cy="0" r="9" fill="#00e676" opacity="0.7" filter="url(#glow-green)" />
   </g>
-  <!-- Segment 4 Spark (Box 4 -> Box 5) -->
+  <!-- Segment 4 Spark (Box 4 to Box 5) -->
   <g class="anim-seg-4-spark" transform="translate(0, 140)">
     <circle cx="0" cy="0" r="5" fill="#ffffff" filter="url(#spark-glow)" />
     <circle cx="0" cy="0" r="9" fill="#38bdf8" opacity="0.7" filter="url(#glow-blue)" />

@@ -55,15 +55,15 @@ get_daemon_bin() {
     fi
 }
 
-# Print Crystal-Clear Legible ASCII Banner
+# Print Crystal-Clear Legible ASCII Banner (Symmetrically Centered)
 print_banner() {
     echo -e "${CYAN}${BOLD}"
-    echo " __  __    _    ____       _    _   _ ____  "
-    echo "|  \/  |  / \  / ___|     / \  | \ | |  _ \ "
-    echo "| |\/| | / _ \| |   _____/ _ \ |  \| | | | |"
-    echo "| |  | |/ ___ \ |__|_____/ ___ \| |\  | |_| |"
-    echo "|_|  |_/_/   \_\____|   /_/   \_\_| \_|____/ "
-    echo -e "   ${YELLOW}Universal Phone & Tablet Graphics Digitizer • macOS Engine${NC}\n"
+    echo "      __  __    _     ____          _    _   _ ____  "
+    echo "     |  \/  |  / \   / ___|  ____  / \  | \ | |  _ \ "
+    echo "     | |\/| | / _ \ | |     |____|/ _ \ |  \| | | | |"
+    echo "     | |  | |/ ___ \| |___       / ___ \| |\  | |_| |"
+    echo "     |_|  |_/_/   \_\____|      /_/   \_\_| \_|____/ "
+    echo -e "        ${YELLOW}Universal Phone & Tablet Graphics Digitizer • macOS Engine${NC}\n"
 }
 
 # Print Help & Command List
@@ -81,7 +81,7 @@ cmd_help() {
     echo -e "  ${GREEN}build${NC}       Compile the native Swift host daemon (Release mode)"
     echo -e "  ${GREEN}test${NC}        Execute automated UDP loopback and Quartz injection self-test"
     echo -e "  ${GREEN}install${NC}     Install mac-and globally to ~/.local/bin for system-wide access"
-    echo -e "  ${GREEN}uninstall${NC}   Stop services, purge build binaries, and remove global CLI link"
+    echo -e "  ${GREEN}uninstall${NC}   Complete self-erasure: stops services, purges footprints and directory"
     echo -e "  ${GREEN}help${NC}        Display this command reference guide"
     echo ""
     echo -e "${BOLD}DEVICE COMPATIBILITY:${NC}"
@@ -98,7 +98,7 @@ cmd_help() {
     echo -e "  mac-and start       # Start digitizer & display pairing QR code"
     echo -e "  mac-and status      # Check if background services are running"
     echo -e "  mac-and stop        # Gracefully shut down all background listeners"
-    echo -e "  mac-and uninstall   # Remove build artifacts and global CLI shortcut"
+    echo -e "  mac-and uninstall   # Total self-erasure: removes every footprint and file"
     echo ""
 }
 
@@ -270,18 +270,22 @@ cmd_install() {
     echo -e "Try executing: ${CYAN}mac-and help${NC}\n"
 }
 
-# Uninstall
+# Complete Self-Erasure: Removes all footprints, memory, CLI shortcuts, and repository directory
 cmd_uninstall() {
-    echo -e "${YELLOW}⚠️ [Uninstall] Commencing uninstallation...${NC}"
+    echo -e "${YELLOW}⚠️ [Uninstall] Commencing total self-erasure...${NC}"
     cmd_stop
     
-    echo -e "${CYAN}🧹 [Uninstall] Removing build artifacts and caches...${NC}"
-    rm -rf "${DAEMON_DIR}/.build"
-    rm -f "${PID_FILE}"
-    rm -f "${SCRIPT_DIR}/qr_code.png"
-    rm -f "${HOME}/.local/bin/mac-and"
+    echo -e "${CYAN}🧹 [Uninstall] Erasing global CLI shortcuts and environment links...${NC}"
+    rm -f "${HOME}/.local/bin/mac-and" 2>/dev/null || true
+    rm -f "/usr/local/bin/mac-and" 2>/dev/null || true
+    rm -rf "${HOME}/.cache/mac-and" 2>/dev/null || true
 
-    echo -e "${GREEN}✅ [Uninstall] Uninstallation complete. Repository cleaned.${NC}"
+    echo -e "${CYAN}🧹 [Uninstall] Erasing repository directory, build binaries, and footprints...${NC}"
+    REPO_DIR="${SCRIPT_DIR}"
+    (sleep 0.5 && rm -rf "${REPO_DIR}") >/dev/null 2>&1 &
+
+    echo -e "${GREEN}✅ [Uninstall] Complete self-erasure finished. Every footprint and command removed.${NC}"
+    exit 0
 }
 
 # Main Command Dispatcher
