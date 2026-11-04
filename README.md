@@ -84,7 +84,7 @@ During engineering and testing across open-source ecosystems (Weylus, OpenTablet
 ### 1. Start the Engine
 Clone the repository and launch the start script:
 ```bash
-git clone https://github.com/anant-rajj/family.git
+git clone https://github.com/anant-rajj/mac-android-family.git
 cd family
 ./start.sh
 ```
