@@ -66,15 +66,15 @@
     <circle cx="-22" cy="0" r="2" fill="#7c4dff" opacity="0.5" />
   </g>
 
-  <!-- STAGE 1: S Pen EMR -->
+  <!-- STAGE 1: Any Phone & Tablet Ingress -->
   <g transform="translate(40, 75)">
     <rect width="140" height="130" rx="12" fill="#151720" stroke="rgba(0,229,255,0.4)" stroke-width="1.8" class="pulsing-node" />
     <rect x="10" y="10" width="28" height="28" rx="6" fill="rgba(0,229,255,0.15)" />
     <text x="24" y="29" font-family="monospace" font-size="14" fill="#00e5ff" font-weight="bold" text-anchor="middle">1</text>
-    <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Wacom EMR</text>
-    <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#00e5ff">240Hz Sampling</text>
-    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Coalesced Events</text>
-    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">4096 Press. Levels</text>
+    <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Phone / Tablet</text>
+    <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#00e5ff">Android &amp; iPad</text>
+    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">S Pen • Pencil • Touch</text>
+    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">240Hz Coalesced</text>
   </g>
 
   <!-- STAGE 2: 1-Euro Filter -->
@@ -95,8 +95,8 @@
     <text x="24" y="29" font-family="monospace" font-size="14" fill="#00e676" font-weight="bold" text-anchor="middle">3</text>
     <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">12-Byte Binary</text>
     <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#00e676">Magic: 0xFACE</text>
-    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Zero JSON Parsing</text>
-    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Packed Integer Struct</text>
+    <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Universal Protocol</text>
+    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Zero Parsing Delay</text>
   </g>
 
   <!-- STAGE 4: Zero-Copy Bridge -->
@@ -118,9 +118,9 @@
     <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Quartz Injection</text>
     <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#ff6b6b">kCGEventTabletPointer</text>
     <text x="24" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Isolated EventSource</text>
-    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Krita • Photoshop</text>
+    <text x="24" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#8892b0">Photoshop • Krita • Blender</text>
   </g>
 
   <!-- Latency Metric Footnote -->
-  <text x="480" y="255" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748b" text-anchor="middle">End-to-End Latency: <tspan fill="#00e676" font-weight="bold">0.8 ms – 1.4 ms</tspan> • Zero Perceptible Input Lag</text>
+  <text x="480" y="255" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748b" text-anchor="middle">End-to-End Latency: <tspan fill="#00e676" font-weight="bold">0.8 ms – 1.4 ms</tspan> • Universal Compatibility on Any Mobile Device</text>
 </svg>
