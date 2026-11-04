@@ -9,11 +9,11 @@ struct FamilyDaemonApp {
         let server = NetworkServer()
         server.start()
         
-        ClipboardBridge.shared.startMonitoring { newText in
-            print("📋 [ClipboardBridge] Local macOS clipboard changed (\(newText.count) chars), broadcasting to S23 Ultra...")
+        ClipboardBridge.shared.startMonitoring { manifest in
+            print("📋 [OmniClip] Outbound clipboard broadcast: \(manifest.clipId)")
         }
         
-        print("🟢 [FamilyDaemon] Running. Listening for S23 Ultra S Pen telemetry...")
+        print("🟢 [FamilyDaemon] Running. Listening for S23 Ultra S Pen telemetry & OmniClip P2P streams...")
         RunLoop.current.run()
     }
 }
