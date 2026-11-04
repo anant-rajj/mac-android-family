@@ -1,0 +1,18 @@
+# Build products & Intermediate caches
+.build/
+build/
+*.o
+*.swiftdoc
+*.swiftmodule
+*.sdkstatcache
+*.xcbuilddata
+.DS_Store
+
+# Virtual environment & Python cache
+__pycache__/
+*.pyc
+
+# IDE files
+.idea/
+.vscode/
+*.iml
