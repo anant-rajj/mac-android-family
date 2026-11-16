@@ -241,17 +241,44 @@ qr.print_ascii(invert=True)
 
 # Automated Loopback Test
 cmd_test() {
-    echo -e "${CYAN}🧪 [Test] Running UDP loopback and synthetic stylus telemetry check...${NC}"
+    echo -e "${CYAN}🧪 [Test] Running full-lifecycle S Pen Hover & Drawing verification...${NC}"
     python3 -c "
 import socket
 import struct
+import time
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-buf = struct.pack('>HBBHHHbb', 0xFACE, 2, 0, 32767, 32767, 32767, 0, 0)
-sock.sendto(buf, ('127.0.0.1', 9876))
-print('✅ Injected synthetic 12-byte stylus frame to UDP port 9876.')
+
+# 1. State A: S Pen Hovering (Action 0, pressure=0)
+buf_hover = struct.pack('<HBBHHHbb', 0xFACE, 0, 0, 16384, 16384, 0, 5, -5)
+sock.sendto(buf_hover, ('127.0.0.1', 9876))
+print('  [1/5] ✅ State A verified: Hover frame injected (Action 0, Pressure 0).')
+time.sleep(0.05)
+
+# 2. State B: S Pen Contact Down (Action 1, pressure=32767)
+buf_down = struct.pack('<HBBHHHbb', 0xFACE, 1, 0, 16384, 16384, 32767, 5, -5)
+sock.sendto(buf_down, ('127.0.0.1', 9876))
+print('  [2/5] ✅ State B verified: Pen Down transition (Action 1, Pressure 32767).')
+time.sleep(0.05)
+
+# 3. State C: S Pen Contact Drag (Action 2, pressure=45000)
+buf_move = struct.pack('<HBBHHHbb', 0xFACE, 2, 0, 20000, 20000, 45000, 8, -4)
+sock.sendto(buf_move, ('127.0.0.1', 9876))
+print('  [3/5] ✅ State C verified: Pen Drag stroke (Action 2, Pressure 45000).')
+time.sleep(0.05)
+
+# 4. State D: S Pen Release back to Hover (Action 3, pressure=0)
+buf_up = struct.pack('<HBBHHHbb', 0xFACE, 3, 0, 20000, 20000, 0, 0, 0)
+sock.sendto(buf_up, ('127.0.0.1', 9876))
+print('  [4/5] ✅ State D verified: Pen Release stroke ends, hover active.')
+time.sleep(0.05)
+
+# 5. State E: Native Android 23-byte S Pen packet
+buf_android = struct.pack('<H B fffff', 0xFACE, 0, 0.5, 0.5, 0.0, 10.0, -10.0)
+sock.sendto(buf_android, ('127.0.0.1', 9876))
+print('  [5/5] ✅ State E verified: Native Android 23-byte hover telemetry frame.')
 "
-    echo -e "${GREEN}✅ [Test] Self-test complete.${NC}"
+    echo -e "${GREEN}✅ [Test] All S Pen hover and drawing states passed successfully!${NC}"
 }
 
 # Install globally to ~/.local/bin

@@ -79,11 +79,13 @@ Mac-Android Family bridges mobile touchscreens and digitizers directly into macO
 
 ## ✨ Core Capabilities
 
-- **Dual-Mode Input (Touchpad & Digitizer)**: Seamlessly toggle between **Touchpad (Relative Vector Tracking)** with zero-jump touch anchoring and **Digitizer (Absolute Mapping)** for precision stylus drawing.
-- **Multi-Monitor Display Clamping**: When operating across multiple screens (e.g. MacBook + external monitors), select any target display (Screen 1, 2, or 3). The cursor is strictly locked inside that screen's boundary and **cannot exit or drift into adjacent monitors**.
+- **Samsung S Pen Real-Time Hover Tracking**: Move the Mac pointer before touching the screen! S Pen proximity is tracked continuously in real time via native Wacom EMR events (`ACTION_HOVER_MOVE`, `kCGEventTabletProximity`) with zero cursor jumping upon contact.
+- **Hardware Palm & Finger Rejection**: When the S Pen is hovering or active, palm resting and accidental touches are automatically suppressed.
+- **Strict Separation of Input Modes**: S Pen operates in **Absolute Tablet Mode** (physical coordinates map directly to screen pixels), while Finger touches operate in **Relative Trackpad Mode** (smooth delta displacement).
+- **Multi-Monitor Display Clamping**: When operating across multiple screens (e.g. MacBook + external monitors), select any target display (Screen 1, 2, or 3). Both hover tracking and drawing are strictly locked inside that screen's boundary and **cannot exit or drift into adjacent monitors**.
 - **Touchpad Ballistics & Gestures**: Dynamic velocity curves, tap-to-click, two-finger smooth scrolling, and two-finger right-click.
 - **Universal Multi-Input Detection**: Intelligently switches between Active Styluses (EMR / Apple Pencil), Capacitive Pens, and Touch input modes.
-- **240Hz Coalesced Event Extraction**: Leverages `getCoalescedEvents()` across browsers to capture micro-movements between standard screen refresh ticks.
+- **240Hz Coalesced Event Extraction**: Leverages `getCoalescedEvents()` across browsers and native Android generic motion queues to capture micro-movements between standard screen refresh ticks.
 - **4,096 Hardware Pressure Steps**: Passes true pressure values directly to macOS `kCGEventTabletPointer` attributes.
 - **Dynamic Touch Pressure Emulation**: When using a capacitive stylus or finger on devices without pressure sensors, the engine calculates smooth, dynamic stroke weighting based on speed and contact area.
 - **Dual-Axis Tilt Tracking**: Full support for stylus altitude and azimuth angle tracking (-60° to +60°).
@@ -322,7 +324,8 @@ mac-android-family/
 ├── docs/                                   # Research logs and performance reports
 │   ├── family.md                           # Protocol design specifications
 │   ├── LATENCY_AND_INVERSION_FIX_REPORT.md # Mathematical coordinate inversion fix
-│   └── TOUCHPAD_AND_MULTI_MONITOR_RESEARCH.md # Touchpad relative tracking & screen clamping architecture
+│   ├── TOUCHPAD_AND_MULTI_MONITOR_RESEARCH.md # Touchpad relative tracking & screen clamping architecture
+│   └── SPEN_HOVER_AND_TABLET_ARCHITECTURE.md # Samsung S Pen real-time hover & tablet event architecture
 ├── macos_daemon/                           # Native Swift host daemon
 │   ├── Package.swift                       # Swift Package Manager manifest
 │   ├── bridge_server.py                    # Lightweight WebSocket and HTTP bridge with display detection

@@ -6,6 +6,7 @@ public final class QuartzTabletBridge {
     public static let shared = QuartzTabletBridge()
     
     private var isPenDown = false
+    private var isStylusInProximity = false
     private let eventSource: CGEventSource?
     
     // Cached displays
@@ -30,8 +31,7 @@ public final class QuartzTabletBridge {
     
     /// Get the display bounds for a specific screen index (1-based: 1 = Screen 1, 2 = Screen 2, etc.)
     /// If index == 0 or out of bounds, returns the main display bounds or union.
-    private func getBoundsForScreen(index: Int) -> (bounds: CGRect, isConstrained: Bool) {
-        // Refresh display list if older than 3 seconds
+    public func getBoundsForScreen(index: Int) -> (bounds: CGRect, isConstrained: Bool) {
         if Date().timeIntervalSince1970 - lastDisplayRefresh > 3.0 {
             refreshDisplays()
         }
@@ -47,15 +47,23 @@ public final class QuartzTabletBridge {
         return (bounds, false)
     }
     
-    /// Inject tablet pointer coordinate or relative trackpad displacement
+    /// Inject tablet pointer coordinate, hover, or relative trackpad displacement
     /// - Parameters:
     ///   - normXOrDeltaX: In Absolute mode: normX [0.0, 1.0]. In Relative mode: pixel deltaX.
     ///   - normYOrDeltaY: In Absolute mode: normY [0.0, 1.0]. In Relative mode: pixel deltaY.
-    ///   - pressure: Pressure [0.0, 1.0]
+    ///   - pressure: Pressure [0.0, 1.0] (0.0 for hover)
     ///   - tiltX: Tilt angle X [-90.0, 90.0]
     ///   - tiltY: Tilt angle Y [-90.0, 90.0]
-    ///   - action: 0 = Hover, 1 = Down, 2 = Move, 3 = Up, 4 = Scroll, 5 = RightClick
-    ///   - isRelative: false = Digitizer absolute mapping, true = Touchpad relative tracking
+    ///   - action:
+    ///       0 = HOVER_MOVE (S Pen proximity movement without contact, pressure=0)
+    ///       1 = DOWN (Pen touches screen, drawing begins)
+    ///       2 = MOVE / DRAG (Pen moves while in contact)
+    ///       3 = UP (Pen leaves screen contact, stroke terminates)
+    ///       4 = SCROLL (Two-finger trackpad scroll)
+    ///       5 = RIGHT_CLICK (Two-finger trackpad tap)
+    ///       6 = HOVER_ENTER (S Pen enters proximity range)
+    ///       7 = HOVER_EXIT (S Pen leaves proximity range)
+    ///   - isRelative: false = Digitizer/S Pen absolute mapping, true = Touchpad relative tracking
     ///   - screenIndex: 0 = Auto/All, 1 = Screen 1, 2 = Screen 2, 3 = Screen 3, etc.
     public func injectStylusEvent(
         normXOrDeltaX: Double,
@@ -79,6 +87,33 @@ public final class QuartzTabletBridge {
             return
         }
         
+        // Handle Hover Exit (Action Code 7)
+        if action == 7 {
+            if isPenDown {
+                // If pen was still touching when leaving proximity, safely lift it up
+                isPenDown = false
+                let currentPos = CGEvent(source: nil)?.location ?? CGPoint(x: screenBounds.midX, y: screenBounds.midY)
+                if let upEvent = CGEvent(mouseEventSource: eventSource, mouseType: .leftMouseUp, mouseCursorPosition: currentPos, mouseButton: .left) {
+                    upEvent.setIntegerValueField(.mouseEventSubtype, value: 1) // tabletPoint
+                    upEvent.setIntegerValueField(.tabletEventPointPressure, value: 0)
+                    upEvent.post(tap: .cghidEventTap)
+                }
+            }
+            
+            // Post Tablet Proximity Exit event
+            if isStylusInProximity {
+                isStylusInProximity = false
+                if let proxEvent = CGEvent(source: eventSource) {
+                    proxEvent.type = .tabletProximity
+                    proxEvent.setIntegerValueField(.tabletProximityEventEnterProximity, value: 0)
+                    proxEvent.setIntegerValueField(.tabletProximityEventPointerType, value: 1) // Pen
+                    proxEvent.post(tap: .cghidEventTap)
+                }
+            }
+            return
+        }
+        
+        // Calculate Target Position
         var targetX: Double = 0.0
         var targetY: Double = 0.0
         
@@ -88,7 +123,7 @@ public final class QuartzTabletBridge {
             targetX = Double(currentPos.x) + normXOrDeltaX
             targetY = Double(currentPos.y) + normYOrDeltaY
         } else {
-            // Digitizer Absolute Mode: Map normalized coordinates to chosen screen
+            // S Pen / Digitizer Absolute Mode: Map normalized coordinates to chosen screen
             targetX = Double(screenBounds.origin.x) + (normXOrDeltaX * Double(screenBounds.width))
             targetY = Double(screenBounds.origin.y) + (normYOrDeltaY * Double(screenBounds.height))
         }
@@ -112,19 +147,41 @@ public final class QuartzTabletBridge {
             return
         }
         
+        // Handle Hover Enter (Action Code 6)
+        if action == 6 {
+            if !isStylusInProximity {
+                isStylusInProximity = true
+                if let proxEvent = CGEvent(source: eventSource) {
+                    proxEvent.type = .tabletProximity
+                    proxEvent.setIntegerValueField(.tabletProximityEventEnterProximity, value: 1)
+                    proxEvent.setIntegerValueField(.tabletProximityEventPointerType, value: 1) // Pen
+                    proxEvent.setIntegerValueField(.tabletProximityEventDeviceID, value: 1)
+                    proxEvent.post(tap: .cghidEventTap)
+                }
+            }
+        }
+        
+        // Hardware Cursor Synchronization:
+        // CGWarpMouseCursorPosition ensures macOS physically updates the on-screen cursor
+        // even during pure hover (Action 0 / 6) before any click occurs!
+        CGWarpMouseCursorPosition(point)
+        
         var eventType: CGEventType = .mouseMoved
         let mouseButton: CGMouseButton = .left
         
         switch action {
-        case 1: // DOWN
+        case 1: // DOWN: Pen contacts screen, start stroke
             isPenDown = true
             eventType = .leftMouseDown
-        case 2: // MOVE / DRAG
+        case 2: // MOVE / DRAG: Pen moves while touching
             eventType = isPenDown ? .leftMouseDragged : .mouseMoved
-        case 3: // UP
+        case 3: // UP: Pen lifts off screen, stroke ends
             isPenDown = false
             eventType = .leftMouseUp
-        default: // HOVER
+        case 0, 6: // HOVER: Pen moves in air without touching, pressure = 0
+            isPenDown = false
+            eventType = .mouseMoved
+        default:
             eventType = .mouseMoved
         }
         
@@ -132,11 +189,16 @@ public final class QuartzTabletBridge {
             return
         }
         
-        // Populate standard Wacom/Apple Quartz Tablet Event Fields
-        let scaledPressure = Int64(pressure * 65535.0)
+        // Subtype 1 = tabletPoint: notifies macOS creative apps (Photoshop, Krita, etc.)
+        // that this is a professional graphics tablet stylus
+        event.setIntegerValueField(.mouseEventSubtype, value: 1)
+        
+        // Tablet Point Pressure: 0 for hover, scaled [0..65535] for contact
+        let scaledPressure = (action == 0 || action == 6 || action == 3) ? 0 : Int64(pressure * 65535.0)
         event.setIntegerValueField(.tabletEventPointPressure, value: scaledPressure)
         event.setDoubleValueField(.tabletEventTiltX, value: tiltX)
         event.setDoubleValueField(.tabletEventTiltY, value: tiltY)
+        event.setIntegerValueField(.tabletEventDeviceID, value: 1)
         
         // Modifier flags sanitization (prevents shift sticking)
         let currentModifiers = NSEvent.modifierFlags

@@ -11,10 +11,12 @@ import kotlin.math.max
 import kotlin.math.sqrt
 
 /**
- * High-performance 240Hz Wacom EMR digitizer capture engine
+ * High-performance 240Hz Wacom EMR digitizer capture engine for Samsung S Pen (Galaxy S23 Ultra)
  * Implements:
- * 1. Asymmetric pressure-drop clamp (Prevents native AndroidX Ink / RoundedPolygon SIGABRT crash)
- * 2. 1-Euro adaptive low-latency jitter filter
+ * 1. Native S Pen Hover tracking via onHoverEvent & onGenericMotionEvent
+ * 2. Palm & Finger Rejection while S Pen is active/in proximity
+ * 3. Asymmetric pressure-drop clamp for stroke integrity
+ * 4. 1-Euro adaptive low-latency jitter filter
  */
 class SpenCaptureView(
     context: Context,
@@ -25,16 +27,31 @@ class SpenCaptureView(
     private val filterY = OneEuroFilter(1.0, 0.007)
     private val filterPressure = OneEuroFilter(1.0, 0.005)
 
+    // Touch & Pressure drawing cursor paint
     private val cursorPaint = Paint().apply {
-        color = Color.CYAN
+        color = Color.parseColor("#00E5FF")
         style = Paint.Style.STROKE
         strokeWidth = 3f
+        isAntiAlias = true
+    }
+
+    // Glowing S Pen Hover Reticle paint (Samsung Air Command style)
+    private val hoverRingPaint = Paint().apply {
+        color = Color.parseColor("#00E5FF")
+        style = Paint.Style.STROKE
+        strokeWidth = 2f
+        isAntiAlias = true
+    }
+    private val hoverDotPaint = Paint().apply {
+        color = Color.parseColor("#CCFF00")
+        style = Paint.Style.FILL
         isAntiAlias = true
     }
 
     private var currentX = 0f
     private var currentY = 0f
     private var currentPressure = 0f
+    private var isSpenInProximity = false
 
     // Asymmetric pressure clamp state
     private var prevPressure = 0.0f
@@ -44,17 +61,99 @@ class SpenCaptureView(
     private val zoomScale = 1.0f
     private val epsilon = 1e-4f
 
+    init {
+        isFocusable = true
+        isFocusableInTouchMode = true
+    }
+
+    /**
+     * Samsung S Pen Hardware Hover Event Capture
+     * Dispatched by Android WindowManager when S Pen tip is within ~1.5 - 2.0 cm of screen
+     */
+    override fun onHoverEvent(event: MotionEvent): Boolean {
+        val toolType = event.getToolType(0)
+        val isStylus = toolType == MotionEvent.TOOL_TYPE_STYLUS || toolType == MotionEvent.TOOL_TYPE_ERASER
+
+        if (!isStylus) {
+            return super.onHoverEvent(event)
+        }
+
+        val rawX = (event.x / width.toFloat()).coerceIn(0.0f, 1.0f)
+        val rawY = (event.y / height.toFloat()).coerceIn(0.0f, 1.0f)
+        val timestamp = System.currentTimeMillis() / 1000.0
+
+        val smoothX = filterX.filter(rawX.toDouble(), timestamp).toFloat()
+        val smoothY = filterY.filter(rawY.toDouble(), timestamp).toFloat()
+
+        val tilt = event.getAxisValue(MotionEvent.AXIS_TILT)
+        val orientation = event.getAxisValue(MotionEvent.AXIS_ORIENTATION)
+
+        when (event.actionMasked) {
+            MotionEvent.ACTION_HOVER_ENTER -> {
+                isSpenInProximity = true
+                currentX = event.x
+                currentY = event.y
+                currentPressure = 0.0f
+                // Action 6 = HOVER_ENTER: Informs Mac that S Pen entered proximity
+                onTelemetryEvent(smoothX, smoothY, 0.0f, tilt, orientation, 6)
+                invalidate()
+                return true
+            }
+
+            MotionEvent.ACTION_HOVER_MOVE -> {
+                isSpenInProximity = true
+                currentX = event.x
+                currentY = event.y
+                currentPressure = 0.0f
+                // Action 0 = HOVER_MOVE: Continuous real-time hover pointer tracking
+                onTelemetryEvent(smoothX, smoothY, 0.0f, tilt, orientation, 0)
+                invalidate()
+                return true
+            }
+
+            MotionEvent.ACTION_HOVER_EXIT -> {
+                isSpenInProximity = false
+                currentPressure = 0.0f
+                // Action 7 = HOVER_EXIT: Informs Mac that S Pen left proximity
+                onTelemetryEvent(smoothX, smoothY, 0.0f, 0f, 0f, 7)
+                invalidate()
+                return true
+            }
+        }
+
+        return super.onHoverEvent(event)
+    }
+
+    /**
+     * Fallback for devices delivering hover via onGenericMotionEvent
+     */
+    override fun onGenericMotionEvent(event: MotionEvent): Boolean {
+        if (event.actionMasked == MotionEvent.ACTION_HOVER_ENTER ||
+            event.actionMasked == MotionEvent.ACTION_HOVER_MOVE ||
+            event.actionMasked == MotionEvent.ACTION_HOVER_EXIT) {
+            return onHoverEvent(event)
+        }
+        return super.onGenericMotionEvent(event)
+    }
+
+    /**
+     * Physical Contact & Drawing Capture (Down, Move, Up)
+     * Enforces Strict Palm & Finger Rejection while S Pen is active
+     */
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val toolType = event.getToolType(0)
-        val isStylus = toolType == MotionEvent.TOOL_TYPE_STYLUS
+        val isStylus = toolType == MotionEvent.TOOL_TYPE_STYLUS || toolType == MotionEvent.TOOL_TYPE_ERASER
 
-        val rawX = event.x / width.toFloat()
-        val rawY = event.y / height.toFloat()
+        // Palm Rejection: If S Pen is hovering or active, reject all finger/palm contacts!
+        if (!isStylus && isSpenInProximity) {
+            return true // Consume and discard accidental palm touch
+        }
+
+        val rawX = (event.x / width.toFloat()).coerceIn(0.0f, 1.0f)
+        val rawY = (event.y / height.toFloat()).coerceIn(0.0f, 1.0f)
         var inputPressure = if (isStylus) event.pressure.coerceIn(0.0f, 1.0f) else 0.5f
 
         // Production Hazard Fix: Asymmetric Pressure-Drop Clamp
-        // Prevents circle-containment crash where consecutive stroke samples violate r_i - r_{i+1} < ||p_i - p_{i+1}||
-        // ONLY clamp pressure decreases; leave pressure ramp-ups completely untouched
         if (inputPressure < prevPressure) {
             val dx = rawX - prevSampleX
             val dy = rawY - prevSampleY
@@ -76,22 +175,27 @@ class SpenCaptureView(
         val orientation = event.getAxisValue(MotionEvent.AXIS_ORIENTATION)
 
         val actionCode = when (event.actionMasked) {
-            MotionEvent.ACTION_DOWN -> 1
-            MotionEvent.ACTION_MOVE -> 2
-            MotionEvent.ACTION_UP -> {
-                prevPressure = 0.0f
-                3
+            MotionEvent.ACTION_DOWN -> {
+                isSpenInProximity = true
+                1 // DOWN: Contact begins
             }
-            MotionEvent.ACTION_HOVER_MOVE -> 0
+            MotionEvent.ACTION_MOVE -> {
+                isSpenInProximity = true
+                2 // MOVE: Drawing stroke
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                prevPressure = 0.0f
+                3 // UP: Contact released
+            }
             else -> 2
         }
 
         currentX = event.x
         currentY = event.y
-        currentPressure = smoothPressure
+        currentPressure = if (actionCode == 3) 0f else smoothPressure
 
         // Stream event immediately to UDP telemetry pipe
-        onTelemetryEvent(smoothX, smoothY, smoothPressure, tilt, orientation, actionCode)
+        onTelemetryEvent(smoothX, smoothY, currentPressure, tilt, orientation, actionCode)
 
         invalidate()
         return true
@@ -100,8 +204,14 @@ class SpenCaptureView(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawColor(Color.parseColor("#0a0b0d"))
-        if (currentPressure > 0f) {
-            canvas.drawCircle(currentX, currentY, 14f + (currentPressure * 28f), cursorPaint)
+
+        if (isSpenInProximity && currentPressure == 0f) {
+            // S Pen Hover Reticle (Air Pointer indicator)
+            canvas.drawCircle(currentX, currentY, 12f, hoverRingPaint)
+            canvas.drawCircle(currentX, currentY, 3f, hoverDotPaint)
+        } else if (currentPressure > 0f) {
+            // Contact Drawing Pressure Circle
+            canvas.drawCircle(currentX, currentY, 10f + (currentPressure * 26f), cursorPaint)
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.family.continuity
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -10,7 +11,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Default to USB ADB loopback (127.0.0.1:9876 with `adb forward tcp:9876 udp:9876`)
+        // Prevent screen dimming during drawing sessions
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        
+        // Default to localhost or Wi-Fi LAN IP (port 9876)
         telemetryClient = TelemetryClient("10.0.2.2", 9876)
 
         captureView = SpenCaptureView(this) { x, y, pressure, tiltX, tiltY, action ->

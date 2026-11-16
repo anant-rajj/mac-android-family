@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Family Continuity • Universal Touchpad & Digitizer</title>
+    <title>Family Continuity • Universal Touchpad & S Pen Digitizer</title>
     <style>
         * {
             box-sizing: border-box;
@@ -30,7 +30,7 @@
             touch-action: none;
             position: relative;
             background: radial-gradient(circle at center, #12151f 0%, #050608 100%);
-            cursor: default;
+            cursor: crosshair;
         }
         
         /* Floating Responsive HUD */
@@ -45,7 +45,7 @@
             pointer-events: auto;
             z-index: 20;
             line-height: 1.5;
-            background: rgba(13, 16, 23, 0.82);
+            background: rgba(13, 16, 23, 0.85);
             padding: 10px 14px;
             border-radius: 12px;
             backdrop-filter: blur(16px);
@@ -53,7 +53,7 @@
             border: 1px solid rgba(0, 229, 255, 0.22);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             transition: all 0.3s ease;
-            max-width: 300px;
+            max-width: 320px;
         }
         #hud.minimized .hud-details {
             display: none;
@@ -116,7 +116,7 @@
             transition: width 0.05s ease-out;
         }
         
-        /* Floating Cursor Feedback */
+        /* Floating Cursor & S Pen Hover Reticle */
         #indicator {
             position: absolute;
             border: 2px solid #00e5ff;
@@ -124,8 +124,34 @@
             pointer-events: none;
             display: none;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 16px rgba(0, 229, 255, 0.5);
+            box-shadow: 0 0 16px rgba(0, 229, 255, 0.6);
             will-change: transform, left, top;
+        }
+        #hover-reticle {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border: 1.5px dashed #00e5ff;
+            border-radius: 50%;
+            pointer-events: none;
+            display: none;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+            animation: spin 10s linear infinite;
+        }
+        #hover-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ccff00;
+            border-radius: 50%;
+            pointer-events: none;
+            display: none;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 8px #ccff00;
+        }
+        @keyframes spin {
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
         /* Top Controls Bar (Mode & Display Selectors) */
@@ -172,13 +198,13 @@
             appearance: none;
             -webkit-appearance: none;
             padding-right: 24px;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300E5FF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300E5FF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
             background-repeat: no-repeat;
             background-position: right 8px top 50%;
             background-size: 8px auto;
         }
 
-        /* Bottom Click Bar (Optional trackpad buttons) */
+        /* Bottom Click Bar */
         #bottom-bar {
             position: absolute;
             bottom: env(safe-area-inset-bottom, 14px);
@@ -216,7 +242,7 @@
             left: 50%;
             transform: translateX(-50%);
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.5);
             pointer-events: none;
             text-align: center;
             letter-spacing: 0.4px;
@@ -229,15 +255,19 @@
     <div id="hud">
         <div class="hud-header" id="hud-toggle">
             <div class="hud-title">
-                <span id="hud-icon">🖱️</span>
-                <span id="hud-mode-title">Trackpad Active</span>
+                <span id="hud-icon">✏️</span>
+                <span id="hud-mode-title">S Pen Engine Ready</span>
             </div>
             <span id="conn-badge" class="hud-badge">Connecting</span>
         </div>
         <div class="hud-details">
             <div class="hud-row">
-                <span>Input Mode:</span>
-                <span id="device-mode" class="hud-val">Touchpad (Relative)</span>
+                <span>Active Tool:</span>
+                <span id="device-mode" class="hud-val">S Pen (EMR Digitizer)</span>
+            </div>
+            <div class="hud-row">
+                <span>S Pen State:</span>
+                <span id="spen-state" class="hud-val">Ready</span>
             </div>
             <div class="hud-row">
                 <span>Display Target:</span>
@@ -245,7 +275,7 @@
             </div>
             <div class="hud-row">
                 <span>Display Lock:</span>
-                <span id="lock-status" class="hud-val" style="color: #00e676;">Clamped (Locked)</span>
+                <span id="lock-status" class="hud-val" style="color: #00e676;">Clamped</span>
             </div>
             <div class="hud-row">
                 <span>Pressure:</span>
@@ -255,8 +285,8 @@
                 <div id="pressure-bar" class="pressure-bar-fill"></div>
             </div>
             <div class="hud-row" style="margin-top: 4px;">
-                <span>Movement:</span>
-                <span id="coords-val" class="hud-val">Δ 0, 0</span>
+                <span>Coordinates:</span>
+                <span id="coords-val" class="hud-val">0.000, 0.000</span>
             </div>
             <div class="hud-row">
                 <span>Sampling Rate:</span>
@@ -266,7 +296,7 @@
     </div>
 
     <div id="controls-bar">
-        <button class="ctrl-btn active-mode" id="mode-btn">🖱️ Touchpad</button>
+        <button class="ctrl-btn active-mode" id="mode-btn">✏️ S Pen / Tablet</button>
         <select class="ctrl-btn" id="screen-select">
             <option value="1">🖥️ Screen 1 (MacBook Air)</option>
             <option value="2">🖥️ Screen 2 (External 1)</option>
@@ -277,9 +307,11 @@
     </div>
     
     <div id="indicator"></div>
+    <div id="hover-reticle"></div>
+    <div id="hover-dot"></div>
     <div id="canvas-area"></div>
 
-    <div id="instructions">Glide finger anywhere to move cursor • Tap to click • Two-finger scroll</div>
+    <div id="instructions">Hover S Pen to move cursor • Touch glass to draw • Palm Rejection Active</div>
 
     <div id="bottom-bar">
         <button class="pad-btn" id="btn-left-click">Left Click</button>
@@ -292,6 +324,7 @@
         
         const badgeEl = document.getElementById("conn-badge");
         const deviceModeEl = document.getElementById("device-mode");
+        const spenStateEl = document.getElementById("spen-state");
         const displayLabelEl = document.getElementById("display-label");
         const lockStatusEl = document.getElementById("lock-status");
         const pressureEl = document.getElementById("pressure-val");
@@ -299,6 +332,8 @@
         const coordsEl = document.getElementById("coords-val");
         const rateEl = document.getElementById("rate-val");
         const indicator = document.getElementById("indicator");
+        const hoverReticle = document.getElementById("hover-reticle");
+        const hoverDot = document.getElementById("hover-dot");
         const canvasArea = document.getElementById("canvas-area");
         const hudEl = document.getElementById("hud");
         const hudToggle = document.getElementById("hud-toggle");
@@ -311,28 +346,30 @@
         const btnLeftClick = document.getElementById("btn-left-click");
         const btnRightClick = document.getElementById("btn-right-click");
 
-        // Modes: "touchpad" (Relative displacement, no jumping) or "digitizer" (Absolute 1:1 mapping)
-        let mode = "touchpad"; // Default to Touchpad mode as requested!
-        let selectedScreen = 1; // Default to Screen 1
+        // Modes: "digitizer" (S Pen Absolute Tablet) or "touchpad" (Finger Relative Trackpad)
+        let mode = "digitizer"; // Default to S Pen Tablet Mode for Galaxy S23 Ultra
+        let selectedScreen = 1;  // Default to Screen 1 (MacBook)
 
-        // Toggle Mode
+        // S Pen Proximity & Palm Rejection State
+        let isSpenInProximity = false;
+        let lastSpenHoverTime = 0;
+
+        // Toggle Finger Mode (S Pen ALWAYS uses Absolute mode regardless of this button!)
         modeBtn.addEventListener("click", () => {
-            if (mode === "touchpad") {
-                mode = "digitizer";
-                modeBtn.textContent = "✏️ Digitizer";
-                modeBtn.classList.remove("active-mode");
-                hudModeTitle.textContent = "Digitizer Active";
-                hudIcon.textContent = "✏️";
-                deviceModeEl.textContent = "Digitizer (Absolute)";
-                instructionsEl.textContent = "1:1 Screen Mapping • Draw with S Pen, Apple Pencil or Stylus";
-            } else {
+            if (mode === "digitizer") {
                 mode = "touchpad";
-                modeBtn.textContent = "🖱️ Touchpad";
-                modeBtn.classList.add("active-mode");
-                hudModeTitle.textContent = "Trackpad Active";
+                modeBtn.textContent = "🖱️ Finger Trackpad";
+                modeBtn.classList.remove("active-mode");
+                hudModeTitle.textContent = "Trackpad Mode";
                 hudIcon.textContent = "🖱️";
-                deviceModeEl.textContent = "Touchpad (Relative)";
-                instructionsEl.textContent = "Glide finger anywhere to move cursor • Tap to click • Two-finger scroll";
+                instructionsEl.textContent = "Finger: Relative Trackpad • S Pen: Absolute Tablet + Hover";
+            } else {
+                mode = "digitizer";
+                modeBtn.textContent = "✏️ S Pen / Tablet";
+                modeBtn.classList.add("active-mode");
+                hudModeTitle.textContent = "S Pen Tablet Mode";
+                hudIcon.textContent = "✏️";
+                instructionsEl.textContent = "Hover S Pen to move cursor • Touch glass to draw • Palm Rejection Active";
             }
         });
 
@@ -368,17 +405,6 @@
             }
         });
 
-        // Bottom click buttons
-        btnLeftClick.addEventListener("pointerdown", () => {
-            sendPacket(1, 0, 0, 1.0, 0, 0); // Down
-        });
-        btnLeftClick.addEventListener("pointerup", () => {
-            sendPacket(3, 0, 0, 0.0, 0, 0); // Up
-        });
-        btnRightClick.addEventListener("pointerdown", () => {
-            sendPacket(5, 0, 0, 1.0, 0, 0); // Right Click
-        });
-
         // Frequency Calculation
         let eventCount = 0;
         let lastTimestamp = (new Date()).getTime();
@@ -403,7 +429,6 @@
                 badgeEl.style.borderColor = "rgba(0, 230, 118, 0.3)";
             };
             ws.onmessage = (event) => {
-                // Handle initial display metadata from bridge_server.py
                 if (typeof event.data === "string") {
                     try {
                         const msg = JSON.parse(event.data);
@@ -438,7 +463,7 @@
 
         // 12-byte packed turbo binary packet layout:
         // [0..1] Magic 0xFACE
-        // [2] Action: 0=Hover, 1=Down, 2=Move/Drag, 3=Up, 4=Scroll, 5=RightClick
+        // [2] Action: 0=HoverMove, 1=Down, 2=Move/Drag, 3=Up, 4=Scroll, 5=RightClick, 6=HoverEnter, 7=HoverExit
         // [3] Flags: (isRelative ? 0x80 : 0x00) | (screenIndex & 0x7F)
         // [4..5] int16 deltaX (Relative) OR uint16 normX (Absolute)
         // [6..7] int16 deltaY (Relative) OR uint16 normY (Absolute)
@@ -457,23 +482,20 @@
             invHeight = 1 / window.innerHeight;
         });
 
-        function sendPacket(actionCode, valX, valY, rawPressure, tiltX, tiltY) {
+        function sendPacket(actionCode, valX, valY, rawPressure, tiltX, tiltY, isRel) {
             if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
-            const isRel = (mode === "touchpad");
             const flags = (isRel ? 0x80 : 0x00) | (selectedScreen & 0x7F);
 
             dataView.setUint8(2, actionCode);
             dataView.setUint8(3, flags);
 
             if (isRel) {
-                // Signed 16-bit integer pixel displacement
                 const clampedDX = Math.max(-32767, Math.min(32767, Math.round(valX)));
                 const clampedDY = Math.max(-32767, Math.min(32767, Math.round(valY)));
                 dataView.setInt16(4, clampedDX, true);
                 dataView.setInt16(6, clampedDY, true);
             } else {
-                // Normalized 16-bit unsigned coordinate [0..65535]
                 dataView.setUint16(4, (valX * 65535) | 0, true);
                 dataView.setUint16(6, (valY * 65535) | 0, true);
             }
@@ -486,135 +508,251 @@
             eventCount++;
         }
 
-        // Touchpad Relative State Management
-        let anchorX = 0;
-        let anchorY = 0;
-        let touchStartTime = 0;
-        let totalDisplacement = 0;
-        let activePointers = new Map();
+        // State variables for finger relative mode
+        let fingerAnchorX = 0;
+        let fingerAnchorY = 0;
+        let fingerTouchStartTime = 0;
+        let fingerTotalDisplacement = 0;
+        let activeFingerPointers = new Map();
 
-        // Pointer event listeners
-        canvasArea.addEventListener("pointerdown", (e) => {
-            canvasArea.setPointerCapture(e.pointerId);
-            activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        // 1. S PEN HOVER & MOVEMENT (Continuous capture without requiring touch-down!)
+        window.addEventListener("pointermove", (e) => {
+            const isStylus = (e.pointerType === "pen");
 
-            if (mode === "touchpad") {
-                // Touchpad: Anchor position without moving cursor!
-                anchorX = e.clientX;
-                anchorY = e.clientY;
-                touchStartTime = Date.now();
-                totalDisplacement = 0;
+            if (isStylus) {
+                // S Pen Detected: STRICT ABSOLUTE GRAPHICS TABLET MODE
+                isSpenInProximity = true;
+                lastSpenHoverTime = Date.now();
+                deviceModeEl.textContent = "S Pen (EMR Digitizer)";
 
-                // Visual Indicator
-                indicator.style.display = "block";
-                indicator.style.left = e.clientX + "px";
-                indicator.style.top = e.clientY + "px";
-                indicator.style.width = "24px";
-                indicator.style.height = "24px";
-
-                coordsEl.textContent = `Anchor @ ${e.clientX | 0}, ${e.clientY | 0}`;
-            } else {
-                // Digitizer Absolute
                 const normX = Math.max(0, Math.min(1, e.clientX * invWidth));
                 const normY = Math.max(0, Math.min(1, e.clientY * invHeight));
-                const pressure = e.pressure > 0 ? e.pressure : 0.5;
-                sendPacket(1, normX, normY, pressure, e.tiltX, e.tiltY);
-                coordsEl.textContent = `${normX.toFixed(3)}, ${normY.toFixed(3)}`;
+
+                if (e.buttons === 0) {
+                    // STATE A: HOVERING (S Pen tip is in air, pressure is ZERO, cursor tracks on Mac!)
+                    spenStateEl.textContent = "Hover Tracking";
+                    spenStateEl.style.color = "#00e5ff";
+                    pressureEl.textContent = "0.000";
+                    pressureBar.style.width = "0%";
+                    coordsEl.textContent = `${normX.toFixed(3)}, ${normY.toFixed(3)}`;
+
+                    // Send Action 0 (HOVER_MOVE) with pressure=0, Absolute positioning
+                    sendPacket(0, normX, normY, 0.0, e.tiltX, e.tiltY, false);
+
+                    // Visual feedback: Samsung Air Command reticle
+                    hoverReticle.style.display = "block";
+                    hoverReticle.style.left = e.clientX + "px";
+                    hoverReticle.style.top = e.clientY + "px";
+                    hoverDot.style.display = "block";
+                    hoverDot.style.left = e.clientX + "px";
+                    hoverDot.style.top = e.clientY + "px";
+                    indicator.style.display = "none";
+                } else {
+                    // STATE C: PEN CONTACT DRAWING (Physical touch, pressure > 0)
+                    spenStateEl.textContent = "Active Drawing";
+                    spenStateEl.style.color = "#00e676";
+                    const pressure = e.pressure > 0 ? e.pressure : 0.5;
+                    pressureEl.textContent = pressure.toFixed(3);
+                    pressureBar.style.width = `${(pressure * 100).toFixed(0)}%`;
+                    coordsEl.textContent = `${normX.toFixed(3)}, ${normY.toFixed(3)}`;
+
+                    // Send Action 2 (MOVE) with actual hardware pressure
+                    sendPacket(2, normX, normY, pressure, e.tiltX, e.tiltY, false);
+
+                    // Visual drawing feedback
+                    hoverReticle.style.display = "none";
+                    hoverDot.style.display = "none";
+                    indicator.style.display = "block";
+                    indicator.style.left = e.clientX + "px";
+                    indicator.style.top = e.clientY + "px";
+                    indicator.style.width = (12 + pressure * 28) + "px";
+                    indicator.style.height = (12 + pressure * 28) + "px";
+                }
+                return;
             }
-        }, { passive: false });
 
-        canvasArea.addEventListener("pointermove", (e) => {
-            if (!activePointers.has(e.pointerId)) return;
-            const prev = activePointers.get(e.pointerId);
+            // Non-Stylus (Finger / Palm Touch Event)
+            // PALM REJECTION: Drop all finger events if S Pen is hovering or was active recently!
+            if (isSpenInProximity && (Date.now() - lastSpenHoverTime < 600)) {
+                return; // 100% Palm Rejection
+            }
 
-            if (mode === "touchpad") {
-                // Check if two-finger gesture
-                if (activePointers.size === 2) {
+            // Ordinary Finger Trackpad logic
+            if (activeFingerPointers.has(e.pointerId)) {
+                deviceModeEl.textContent = "Finger Touch";
+                spenStateEl.textContent = "Trackpad Active";
+                spenStateEl.style.color = "#94a3b8";
+
+                const prev = activeFingerPointers.get(e.pointerId);
+
+                if (activeFingerPointers.size === 2) {
+                    // Two-finger scroll
                     const scrollDY = -(e.clientY - prev.y) * 1.5;
                     const scrollDX = (e.clientX - prev.x) * 1.5;
-                    sendPacket(4, scrollDX, scrollDY, 0, 0, 0); // Action 4 = Scroll
-                    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+                    sendPacket(4, scrollDX, scrollDY, 0, 0, 0, true);
+                    activeFingerPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
                     coordsEl.textContent = `Scroll Δ ${scrollDY | 0}`;
                     return;
                 }
 
-                // 1-Finger Gliding: Calculate relative delta
-                const rawDX = e.clientX - anchorX;
-                const rawDY = e.clientY - anchorY;
-                totalDisplacement += Math.hypot(rawDX, rawDY);
+                if (mode === "touchpad") {
+                    const rawDX = e.clientX - fingerAnchorX;
+                    const rawDY = e.clientY - fingerAnchorY;
+                    fingerTotalDisplacement += Math.hypot(rawDX, rawDY);
 
-                // Trackpad Ballistics (acceleration curve)
-                const speed = Math.hypot(rawDX, rawDY);
-                const accel = Math.min(2.8, 1.0 + (speed * 0.04));
-                const deltaX = rawDX * accel;
-                const deltaY = rawDY * accel;
+                    const speed = Math.hypot(rawDX, rawDY);
+                    const accel = Math.min(2.8, 1.0 + (speed * 0.04));
+                    const deltaX = rawDX * accel;
+                    const deltaY = rawDY * accel;
 
-                // Is dragging or moving?
-                const isDrag = (e.pointerType === "pen" && e.pressure > 0.15) || (e.buttons > 0 && totalDisplacement > 15);
-                const actionCode = isDrag ? 2 : 0; // 2 = Drag, 0 = Relative Move
-                const pressure = e.pressure > 0 ? e.pressure : (isDrag ? 0.6 : 0.0);
+                    const isDrag = (e.buttons > 0 && fingerTotalDisplacement > 15);
+                    const actCode = isDrag ? 2 : 0;
+                    sendPacket(actCode, deltaX, deltaY, isDrag ? 0.6 : 0.0, e.tiltX, e.tiltY, true);
 
-                sendPacket(actionCode, deltaX, deltaY, pressure, e.tiltX, e.tiltY);
+                    fingerAnchorX = e.clientX;
+                    fingerAnchorY = e.clientY;
+                    activeFingerPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
-                // Update anchor to current position
-                anchorX = e.clientX;
-                anchorY = e.clientY;
-                activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-
-                coordsEl.textContent = `Δ ${deltaX > 0 ? '+' : ''}${deltaX.toFixed(1)}, ${deltaY > 0 ? '+' : ''}${deltaY.toFixed(1)}`;
-                pressureEl.textContent = pressure.toFixed(3);
-                pressureBar.style.width = `${(pressure * 100).toFixed(0)}%`;
-
-                indicator.style.left = e.clientX + "px";
-                indicator.style.top = e.clientY + "px";
-            } else {
-                // Digitizer Absolute
-                const normX = Math.max(0, Math.min(1, e.clientX * invWidth));
-                const normY = Math.max(0, Math.min(1, e.clientY * invHeight));
-                const pressure = e.pressure > 0 ? e.pressure : (e.buttons > 0 ? 0.5 : 0.0);
-                const actionCode = e.buttons > 0 ? 2 : 0;
-                sendPacket(actionCode, normX, normY, pressure, e.tiltX, e.tiltY);
-
-                coordsEl.textContent = `${normX.toFixed(3)}, ${normY.toFixed(3)}`;
-                pressureEl.textContent = pressure.toFixed(3);
-                pressureBar.style.width = `${(pressure * 100).toFixed(0)}%`;
+                    coordsEl.textContent = `Δ ${deltaX > 0 ? '+' : ''}${deltaX.toFixed(1)}, ${deltaY > 0 ? '+' : ''}${deltaY.toFixed(1)}`;
+                } else {
+                    // Finger in digitizer mode
+                    const normX = Math.max(0, Math.min(1, e.clientX * invWidth));
+                    const normY = Math.max(0, Math.min(1, e.clientY * invHeight));
+                    sendPacket(2, normX, normY, 0.5, e.tiltX, e.tiltY, false);
+                    coordsEl.textContent = `${normX.toFixed(3)}, ${normY.toFixed(3)}`;
+                }
 
                 indicator.style.display = "block";
                 indicator.style.left = e.clientX + "px";
                 indicator.style.top = e.clientY + "px";
+                indicator.style.width = "20px";
+                indicator.style.height = "20px";
             }
         }, { passive: false });
 
-        const endPointer = (e) => {
-            activePointers.delete(e.pointerId);
+        // 2. POINTER DOWN (Physical contact begins)
+        canvasArea.addEventListener("pointerdown", (e) => {
+            canvasArea.setPointerCapture(e.pointerId);
+            const isStylus = (e.pointerType === "pen");
 
-            if (mode === "touchpad") {
-                const duration = Date.now() - touchStartTime;
-                // Tap-to-click detection: Quick tap with little displacement
-                if (duration < 240 && totalDisplacement < 10) {
-                    sendPacket(1, 0, 0, 1.0, 0, 0); // Down
-                    setTimeout(() => {
-                        sendPacket(3, 0, 0, 0.0, 0, 0); // Up
-                    }, 40);
-                    coordsEl.textContent = "Tap: Click!";
-                } else {
-                    sendPacket(3, 0, 0, 0.0, 0, 0);
-                }
-            } else {
-                sendPacket(3, 0, 0, 0.0, 0, 0);
+            if (isStylus) {
+                // STATE B: S PEN CONTACT (Seamless transition from hover to pen-down with ZERO jump!)
+                isSpenInProximity = true;
+                lastSpenHoverTime = Date.now();
+                const normX = Math.max(0, Math.min(1, e.clientX * invWidth));
+                const normY = Math.max(0, Math.min(1, e.clientY * invHeight));
+                const pressure = e.pressure > 0 ? e.pressure : 0.5;
+
+                spenStateEl.textContent = "Contact Down";
+                spenStateEl.style.color = "#00e676";
+                pressureEl.textContent = pressure.toFixed(3);
+                pressureBar.style.width = `${(pressure * 100).toFixed(0)}%`;
+
+                // Action 1 (DOWN): Begin drawing at current hover position!
+                sendPacket(1, normX, normY, pressure, e.tiltX, e.tiltY, false);
+
+                hoverReticle.style.display = "none";
+                hoverDot.style.display = "none";
+                indicator.style.display = "block";
+                indicator.style.left = e.clientX + "px";
+                indicator.style.top = e.clientY + "px";
+                return;
             }
 
-            if (activePointers.size === 0) {
+            // Finger touch down
+            if (isSpenInProximity && (Date.now() - lastSpenHoverTime < 600)) {
+                return; // Palm Rejection
+            }
+
+            activeFingerPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+            fingerAnchorX = e.clientX;
+            fingerAnchorY = e.clientY;
+            fingerTouchStartTime = Date.now();
+            fingerTotalDisplacement = 0;
+
+            if (mode === "digitizer") {
+                const normX = Math.max(0, Math.min(1, e.clientX * invWidth));
+                const normY = Math.max(0, Math.min(1, e.clientY * invHeight));
+                sendPacket(1, normX, normY, 0.5, e.tiltX, e.tiltY, false);
+            }
+        }, { passive: false });
+
+        // 3. POINTER UP (Contact ends, transition back to hover if pen remains near glass)
+        const handlePointerEnd = (e) => {
+            const isStylus = (e.pointerType === "pen");
+
+            if (isStylus) {
+                // STATE D: PEN RELEASE (Stroke terminates immediately; hover tracking resumes!)
+                const normX = Math.max(0, Math.min(1, e.clientX * invWidth));
+                const normY = Math.max(0, Math.min(1, e.clientY * invHeight));
+
+                spenStateEl.textContent = "Pen Released (Hovering)";
+                spenStateEl.style.color = "#00e5ff";
+                pressureEl.textContent = "0.000";
+                pressureBar.style.width = "0%";
+
+                // Action 3 (UP): End drawing stroke
+                sendPacket(3, normX, normY, 0.0, e.tiltX, e.tiltY, false);
+
+                // Show hover reticle again
+                hoverReticle.style.display = "block";
+                hoverReticle.style.left = e.clientX + "px";
+                hoverReticle.style.top = e.clientY + "px";
+                hoverDot.style.display = "block";
+                hoverDot.style.left = e.clientX + "px";
+                hoverDot.style.top = e.clientY + "px";
+                indicator.style.display = "none";
+                return;
+            }
+
+            // Finger up logic
+            activeFingerPointers.delete(e.pointerId);
+            if (mode === "touchpad") {
+                const duration = Date.now() - fingerTouchStartTime;
+                if (duration < 240 && fingerTotalDisplacement < 10) {
+                    sendPacket(1, 0, 0, 1.0, 0, 0, true);
+                    setTimeout(() => sendPacket(3, 0, 0, 0.0, 0, 0, true), 40);
+                    coordsEl.textContent = "Tap: Click!";
+                } else {
+                    sendPacket(3, 0, 0, 0.0, 0, 0, true);
+                }
+            } else {
+                sendPacket(3, 0, 0, 0.0, 0, 0, false);
+            }
+
+            if (activeFingerPointers.size === 0) {
                 indicator.style.display = "none";
                 pressureBar.style.width = "0%";
                 pressureEl.textContent = "0.000";
             }
         };
 
-        canvasArea.addEventListener("pointerup", endPointer, { passive: false });
-        canvasArea.addEventListener("pointercancel", endPointer, { passive: false });
+        canvasArea.addEventListener("pointerup", handlePointerEnd, { passive: false });
+        canvasArea.addEventListener("pointercancel", handlePointerEnd, { passive: false });
 
-        // Prevent browser gestures
+        // 4. S PEN HOVER EXIT (Pen leaves hover detection range)
+        window.addEventListener("pointerout", (e) => {
+            if (e.pointerType === "pen") {
+                isSpenInProximity = false;
+                spenStateEl.textContent = "Outside Range";
+                spenStateEl.style.color = "#64748b";
+                hoverReticle.style.display = "none";
+                hoverDot.style.display = "none";
+                indicator.style.display = "none";
+
+                const normX = Math.max(0, Math.min(1, e.clientX * invWidth));
+                const normY = Math.max(0, Math.min(1, e.clientY * invHeight));
+                // Action 7 (HOVER_EXIT): Tells Mac S Pen left proximity
+                sendPacket(7, normX, normY, 0.0, 0, 0, false);
+            }
+        });
+
+        // Bottom click buttons
+        btnLeftClick.addEventListener("pointerdown", () => sendPacket(1, 0, 0, 1.0, 0, 0, true));
+        btnLeftClick.addEventListener("pointerup", () => sendPacket(3, 0, 0, 0.0, 0, 0, true));
+        btnRightClick.addEventListener("pointerdown", () => sendPacket(5, 0, 0, 1.0, 0, 0, true));
+
+        // Prevent browser default zoom & gestures
         document.addEventListener("contextmenu", e => e.preventDefault());
         document.addEventListener("touchmove", e => { if (e.scale !== 1) e.preventDefault(); }, { passive: false });
     </script>

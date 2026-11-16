@@ -55,15 +55,16 @@ public final class NetworkServer {
     /// [0..1] Magic 0xFACE, [2] action, [3] flags (bit 7: isRelative, bits 0-6: screenIndex),
     /// [4..5] uint16 normX / int16 deltaX, [6..7] uint16 normY / int16 deltaY,
     /// [8..9] uint16 pressure, [10] int8 tiltX, [11] int8 tiltY
-    /// Format B (Legacy 23-byte float layout)
+    /// Format B (Native Android 23-byte float layout):
+    /// [0..1] Magic 0xFACE, [2] action, [3..6] float normX, [7..10] float normY,
+    /// [11..14] float pressure, [15..18] float tiltX, [19..22] float tiltY
     private func parsePacket(_ data: Data) {
         let count = data.count
         guard count >= 12, data[0] == 0xFA, data[1] == 0xCE else { return }
         
         let action = Int(data[2])
-        let flags = data[3]
-        let isRelative = (flags & 0x80) != 0
-        let screenIndex = Int(flags & 0x7F)
+        var isRelative = false
+        var screenIndex = 0
         
         var valX: Double = 0.0
         var valY: Double = 0.0
@@ -72,6 +73,10 @@ public final class NetworkServer {
         var tiltY: Double = 0.0
         
         if count == 12 {
+            let flags = data[3]
+            isRelative = (flags & 0x80) != 0
+            screenIndex = Int(flags & 0x7F)
+            
             if isRelative {
                 // Signed Int16 pixel delta
                 let dX = data.subdata(in: 4..<6).withUnsafeBytes { $0.load(as: Int16.self) }
@@ -94,7 +99,7 @@ public final class NetworkServer {
             tiltX = Double(tX)
             tiltY = Double(tY)
         } else if count >= 23 {
-            // 23-byte IEEE float path
+            // Native Android S Pen 23-byte IEEE float packet (Always absolute graphics tablet mode!)
             func readFloat(offset: Int) -> Float {
                 return data.subdata(in: offset..<(offset + 4)).withUnsafeBytes { $0.load(as: Float.self) }
             }
@@ -103,6 +108,10 @@ public final class NetworkServer {
             pressure = Double(readFloat(offset: 11))
             tiltX = Double(readFloat(offset: 15))
             tiltY = Double(readFloat(offset: 19))
+            
+            // S Pen events from Android client are always absolute positioning
+            isRelative = false
+            screenIndex = 0
         }
         
         QuartzTabletBridge.shared.injectStylusEvent(
