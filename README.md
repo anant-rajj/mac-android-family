@@ -27,6 +27,7 @@ Engineered with sub-millisecond event synthesis, native Apple Quartz tablet taps
 
 - [Universal Device & Stylus Support](#-universal-device--stylus-support)
 - [System Architecture](#-system-architecture)
+- [Architecture Research & Prior-Art Analysis](#-architecture-research--prior-art-analysis)
 - [Core Capabilities](#-core-capabilities)
 - [Data Pipeline](#-data-pipeline)
 - [How to Download & Install](#-how-to-download--install)
@@ -74,6 +75,17 @@ Mac-Android Family bridges mobile touchscreens and digitizers directly into macO
          ▼
 [ Creative Apps: Krita • Photoshop • Blender • Affinity ]
 ```
+
+---
+
+## 🔬 Architecture Research & Prior-Art Analysis
+
+An exhaustive technical investigation was conducted across established open-source and commercial graphics tablet bridges (**PenBridge**, **VirtualTablet**, **Weylus**, and **Slide Android**) to benchmark best practices and catalog documented failure modes:
+
+- 📑 **[External Project Research](docs/EXTERNAL_PROJECT_RESEARCH.md)**: Exhaustive examination of wire protocols, Architecture Decision Records (ADR-0003 through ADR-0038), Bluetooth HID vs UDP transports, GeckoView vs Blink browser quirks, and Android/macOS platform limits.
+- ⚠️ **[Development Failure Database](docs/FAILURE_DATABASE.md)**: Catalog of 15 verified engineering failures, reproduction steps, technical causes, initial attempts, final fixes, relevance to Mac-Android Family, and preventative test designs.
+- 🔍 **[Architecture Gap Analysis](docs/ARCHITECTURE_GAP_ANALYSIS.md)**: Subsystem-by-subsystem evaluation (Android S Pen capture, Web client, macOS CoreGraphics injection, transport), comparison matrix, and strict P0/P1/P2/P3 risk classification.
+- 🧪 **[Testing Gap Analysis & Prevention Checklist](docs/TESTING_GAP_ANALYSIS.md)**: Concrete unit/integration test specifications, hardware verification matrix on the Galaxy S23 Ultra, ranked prevention checklist, and complete source bibliography.
 
 ---
 
@@ -322,6 +334,10 @@ mac-android-family/
 │       ├── SpenCaptureView.kt              # Multi-touch event listener with 1-Euro filter
 │       └── TelemetryClient.kt              # UDP socket packet serializer
 ├── docs/                                   # Research logs and performance reports
+│   ├── EXTERNAL_PROJECT_RESEARCH.md        # Technical prior-art failure analysis (PenBridge, Weylus, etc.)
+│   ├── FAILURE_DATABASE.md                 # 15 verified engineering failure case studies
+│   ├── ARCHITECTURE_GAP_ANALYSIS.md        # System gap analysis & P0/P1/P2/P3 risk classification
+│   ├── TESTING_GAP_ANALYSIS.md             # Testing deficits, S23 Ultra hardware matrix & bibliography
 │   ├── family.md                           # Protocol design specifications
 │   ├── LATENCY_AND_INVERSION_FIX_REPORT.md # Mathematical coordinate inversion fix
 │   ├── TOUCHPAD_AND_MULTI_MONITOR_RESEARCH.md # Touchpad relative tracking & screen clamping architecture

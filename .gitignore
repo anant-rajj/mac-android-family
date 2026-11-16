@@ -25,3 +25,6 @@ void-01/dist/
 .idea/
 .vscode/
 *.iml
+
+# Research artifacts & third-party cloned references
+research/
