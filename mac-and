@@ -134,12 +134,14 @@ cmd_start() {
     fi
 
     echo -e "${CYAN}🚀 [Launch] Starting native Quartz tablet daemon...${NC}"
-    "${DAEMON_EXEC}" > /dev/null 2>&1 &
+    nohup "${DAEMON_EXEC}" > /dev/null 2>&1 &
     DAEMON_PID=$!
+    disown ${DAEMON_PID} 2>/dev/null || true
 
     echo -e "${CYAN}⚡ [Launch] Starting WebSocket bridge and web server...${NC}"
-    python3 "${BRIDGE_SCRIPT}" > /dev/null 2>&1 &
+    nohup python3 "${BRIDGE_SCRIPT}" > /dev/null 2>&1 &
     BRIDGE_PID=$!
+    disown ${BRIDGE_PID} 2>/dev/null || true
 
     echo "${DAEMON_PID}" > "${PID_FILE}"
     echo "${BRIDGE_PID}" >> "${PID_FILE}"

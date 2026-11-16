@@ -6,6 +6,9 @@ import threading
 import socket
 import os
 import sys
+import json
+import ctypes
+from ctypes import c_uint32, byref, Structure, c_double
 
 WEB_PORT = 8080
 WS_PORT = 9877
@@ -28,6 +31,43 @@ def get_lan_ip():
     return ip
 
 LOCAL_IP = get_lan_ip()
+
+# Query active macOS connected displays
+class CGPoint(Structure):
+    _fields_ = [('x', c_double), ('y', c_double)]
+class CGSize(Structure):
+    _fields_ = [('width', c_double), ('height', c_double)]
+class CGRect(Structure):
+    _fields_ = [('origin', CGPoint), ('size', CGSize)]
+
+def get_connected_displays():
+    displays_info = []
+    try:
+        cg = ctypes.cdll.LoadLibrary('/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics')
+        cg.CGDisplayBounds.restype = CGRect
+        cg.CGDisplayBounds.argtypes = [c_uint32]
+        count = c_uint32()
+        cg.CGGetActiveDisplayList(0, None, byref(count))
+        displays = (c_uint32 * count.value)()
+        cg.CGGetActiveDisplayList(count.value, displays, byref(count))
+        for i in range(count.value):
+            b = cg.CGDisplayBounds(displays[i])
+            name = f"Screen {i + 1}"
+            if i == 0:
+                name += " (MacBook)"
+            else:
+                name += f" (Ext {i})"
+            displays_info.append({
+                "index": i + 1,
+                "name": name,
+                "width": int(b.size.width),
+                "height": int(b.size.height),
+                "x": int(b.origin.x),
+                "y": int(b.origin.y)
+            })
+    except Exception as e:
+        displays_info = [{"index": 1, "name": "Primary Screen", "width": 1920, "height": 1080, "x": 0, "y": 0}]
+    return displays_info
 
 # 1. HTTP Static Web Server for Browser Client
 class SilentHandler(http.server.SimpleHTTPRequestHandler):
@@ -58,7 +98,16 @@ async def ws_handler(websocket):
     except Exception:
         pass
 
-    print(f"📱 [Link] Stylus device connected via low-latency socket.")
+    print(f"📱 [Link] Stylus / Touch device connected via low-latency socket.")
+    
+    # Send displays metadata to browser client
+    try:
+        displays = get_connected_displays()
+        init_payload = json.dumps({"type": "init", "displays": displays})
+        await websocket.send(init_payload)
+    except Exception:
+        pass
+
     try:
         async for message in websocket:
             # Handles both 12-byte turbo packets and 23-byte legacy frames
@@ -67,7 +116,7 @@ async def ws_handler(websocket):
     except Exception:
         pass
     finally:
-        print("📱 [Link] Stylus device disconnected.")
+        print("📱 [Link] Stylus / Touch device disconnected.")
 
 async def start_ws():
     async with websockets.serve(

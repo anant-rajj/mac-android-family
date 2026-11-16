@@ -52,29 +52,44 @@ public final class NetworkServer {
     
     /// Supports both:
     /// Format A (Turbo 12-byte packed integer layout):
-    /// [0..1] Magic 0xFACE, [2] action, [4..5] uint16 x, [6..7] uint16 y, [8..9] uint16 pressure, [10] int8 tiltX, [11] int8 tiltY
-    /// Format B (Legacy 23-byte float layout):
+    /// [0..1] Magic 0xFACE, [2] action, [3] flags (bit 7: isRelative, bits 0-6: screenIndex),
+    /// [4..5] uint16 normX / int16 deltaX, [6..7] uint16 normY / int16 deltaY,
+    /// [8..9] uint16 pressure, [10] int8 tiltX, [11] int8 tiltY
+    /// Format B (Legacy 23-byte float layout)
     private func parsePacket(_ data: Data) {
         let count = data.count
         guard count >= 12, data[0] == 0xFA, data[1] == 0xCE else { return }
         
         let action = Int(data[2])
-        var normX: Double = 0.0
-        var normY: Double = 0.0
+        let flags = data[3]
+        let isRelative = (flags & 0x80) != 0
+        let screenIndex = Int(flags & 0x7F)
+        
+        var valX: Double = 0.0
+        var valY: Double = 0.0
         var pressure: Double = 0.0
         var tiltX: Double = 0.0
         var tiltY: Double = 0.0
         
         if count == 12 {
-            // Turbo 12-byte path: zero floating point byte conversion on network
-            let uX = data.subdata(in: 4..<6).withUnsafeBytes { $0.load(as: UInt16.self) }
-            let uY = data.subdata(in: 6..<8).withUnsafeBytes { $0.load(as: UInt16.self) }
+            if isRelative {
+                // Signed Int16 pixel delta
+                let dX = data.subdata(in: 4..<6).withUnsafeBytes { $0.load(as: Int16.self) }
+                let dY = data.subdata(in: 6..<8).withUnsafeBytes { $0.load(as: Int16.self) }
+                valX = Double(dX)
+                valY = Double(dY)
+            } else {
+                // Unsigned UInt16 normalized coordinate [0..65535]
+                let uX = data.subdata(in: 4..<6).withUnsafeBytes { $0.load(as: UInt16.self) }
+                let uY = data.subdata(in: 6..<8).withUnsafeBytes { $0.load(as: UInt16.self) }
+                valX = Double(uX) / 65535.0
+                valY = Double(uY) / 65535.0
+            }
+            
             let uP = data.subdata(in: 8..<10).withUnsafeBytes { $0.load(as: UInt16.self) }
             let tX = Int8(bitPattern: data[10])
             let tY = Int8(bitPattern: data[11])
             
-            normX = Double(uX) / 65535.0
-            normY = Double(uY) / 65535.0
             pressure = Double(uP) / 65535.0
             tiltX = Double(tX)
             tiltY = Double(tY)
@@ -83,20 +98,22 @@ public final class NetworkServer {
             func readFloat(offset: Int) -> Float {
                 return data.subdata(in: offset..<(offset + 4)).withUnsafeBytes { $0.load(as: Float.self) }
             }
-            normX = Double(readFloat(offset: 3))
-            normY = Double(readFloat(offset: 7))
+            valX = Double(readFloat(offset: 3))
+            valY = Double(readFloat(offset: 7))
             pressure = Double(readFloat(offset: 11))
             tiltX = Double(readFloat(offset: 15))
             tiltY = Double(readFloat(offset: 19))
         }
         
         QuartzTabletBridge.shared.injectStylusEvent(
-            normX: normX,
-            normY: normY,
+            normXOrDeltaX: valX,
+            normYOrDeltaY: valY,
             pressure: pressure,
             tiltX: tiltX,
             tiltY: tiltY,
-            action: action
+            action: action,
+            isRelative: isRelative,
+            screenIndex: screenIndex
         )
     }
 }

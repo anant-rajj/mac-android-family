@@ -12,6 +12,15 @@ build/
 __pycache__/
 *.pyc
 
+# Runtime PIDs
+.family_runtime.pid
+
+# Node / Web dependencies
+node_modules/
+dist/
+void-01/node_modules/
+void-01/dist/
+
 # IDE files
 .idea/
 .vscode/

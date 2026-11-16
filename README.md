@@ -79,6 +79,9 @@ Mac-Android Family bridges mobile touchscreens and digitizers directly into macO
 
 ## ✨ Core Capabilities
 
+- **Dual-Mode Input (Touchpad & Digitizer)**: Seamlessly toggle between **Touchpad (Relative Vector Tracking)** with zero-jump touch anchoring and **Digitizer (Absolute Mapping)** for precision stylus drawing.
+- **Multi-Monitor Display Clamping**: When operating across multiple screens (e.g. MacBook + external monitors), select any target display (Screen 1, 2, or 3). The cursor is strictly locked inside that screen's boundary and **cannot exit or drift into adjacent monitors**.
+- **Touchpad Ballistics & Gestures**: Dynamic velocity curves, tap-to-click, two-finger smooth scrolling, and two-finger right-click.
 - **Universal Multi-Input Detection**: Intelligently switches between Active Styluses (EMR / Apple Pencil), Capacitive Pens, and Touch input modes.
 - **240Hz Coalesced Event Extraction**: Leverages `getCoalescedEvents()` across browsers to capture micro-movements between standard screen refresh ticks.
 - **4,096 Hardware Pressure Steps**: Passes true pressure values directly to macOS `kCGEventTabletPointer` attributes.
@@ -88,6 +91,7 @@ Mac-Android Family bridges mobile touchscreens and digitizers directly into macO
 - **Turbo 12-Byte Wire Format**: Packed binary format over WebSockets with `TCP_NODELAY`, bypassing heavy JSON parsers.
 - **Isolated Quartz Event Tap**: Uses a private `CGEventSource` state to prevent modifier key latching bugs across macOS.
 - **Global `mac-and` Terminal Command**: Execute commands from any terminal session without prefixing directory paths.
+- **VOID/01 3D Dimensional Experience**: Includes an ultra-interactive WebGL/Three.js spatial interface with zero-gravity physics, procedural audio synthesis, and interactive geometric specimens.
 
 ---
 
@@ -317,16 +321,21 @@ mac-android-family/
 │       └── TelemetryClient.kt              # UDP socket packet serializer
 ├── docs/                                   # Research logs and performance reports
 │   ├── family.md                           # Protocol design specifications
-│   └── LATENCY_AND_INVERSION_FIX_REPORT.md # Mathematical coordinate inversion fix
+│   ├── LATENCY_AND_INVERSION_FIX_REPORT.md # Mathematical coordinate inversion fix
+│   └── TOUCHPAD_AND_MULTI_MONITOR_RESEARCH.md # Touchpad relative tracking & screen clamping architecture
 ├── macos_daemon/                           # Native Swift host daemon
 │   ├── Package.swift                       # Swift Package Manager manifest
-│   ├── bridge_server.py                    # Lightweight WebSocket and HTTP bridge
+│   ├── bridge_server.py                    # Lightweight WebSocket and HTTP bridge with display detection
 │   └── Sources/FamilyDaemon/
 │       ├── main.swift                      # Daemon entrypoint and signal handling
-│       ├── NetworkServer.swift             # High-throughput UDP packet parser
-│       └── QuartzTabletBridge.swift        # Apple Quartz event tap synthesizer
-├── web_client/                             # Universal zero-install browser digitizer
-│   └── index.html                          # 240Hz pointer canvas and binary streamer
+│       ├── NetworkServer.swift             # High-throughput UDP packet parser (Touchpad & Digitizer)
+│       └── QuartzTabletBridge.swift        # Apple Quartz event tap synthesizer with screen boundary lock
+├── web_client/                             # Universal zero-install browser digitizer & touchpad
+│   └── index.html                          # 240Hz pointer canvas, mode switch, and multi-screen selector
+├── void-01/                                # VOID/01 Ultra-Interactive 3D Website
+│   ├── src/                                # React + Three.js components and physics shaders
+│   ├── index.html                          # 3D viewport mount and web fonts
+│   └── package.json                        # Frontend dependencies and build pipeline
 ├── mac-and                                 # Primary global CLI executable
 ├── install.sh                              # Automated installer for ~/.local/bin/mac-and
 ├── uninstall.sh                            # One-line uninstaller script
